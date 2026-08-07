@@ -1,6 +1,7 @@
 from interface.core.terminal import Terminal
 from services.inventory.product_service import ProductService
 from services.inventory.category_service import CategoryService
+from typing import Any
 
 
 class ConsultMenu:
@@ -30,8 +31,8 @@ class ConsultMenu:
                 break
 
     def _product_stock(self) -> None:
+        rows: list[list[Any]] = []
         products = self._product_service.list_products()
-        rows = []
 
         for product in products:
             status = product.status.value if hasattr(product.status, "value") else product.status
@@ -52,10 +53,11 @@ class ConsultMenu:
         )
         print()
         Terminal.pause()
+            
 
     def _categories_list(self):
         categories = self._category_service.list_category()
-        rows = []
+        rows: list[list[Any]] = []
         
         for category in categories:
                     rows.append(
