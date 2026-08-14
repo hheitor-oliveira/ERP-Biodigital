@@ -1,7 +1,5 @@
 from interface.core.terminal import Terminal
 from services.inventory.product_service import ProductService
-from domain.enums.product_status import ProductStatus
-from typing import Any
 
 
 class EditMenu:
@@ -43,34 +41,38 @@ class EditMenu:
                 break
 
     def change_product_name(self):
-
-        Terminal.clear()
-        products = self._product_service.list_products()
-        rows = []
-        chose_product = None
-        chose_product_id = None
-        new_name = None
-        exib_name = None
-
-        if products:
-            while True:
-                products = self._product_service.list_products()
-                rows: list[list[Any]] = []
-                Terminal.header("Área de Edição", "Alterar Nome de Produto")
-
-                for c, product in enumerate(products, start=1):
-                    status = product.status.value if hasattr(
-                        product.status, "value") else product.status
-                    rows.append(
-                        [
-                            c,
-                            product.name.title(),
-                            product.category.name.capitalize(),
-                            product.stock_quantity,
-                            Terminal.money(product.cost_price),
-                            Terminal.money(product.sale_value),
-                            status,
-                        ]
+        
+            Terminal.clear()
+            products = self._product_service.list_products()
+            rows = []
+            chose_product = None
+            chose_product_id = None
+            new_name = None
+            exib_name = None
+    
+            if products:
+                while True:
+                    products = self._product_service.list_products()
+                    rows = []
+                    Terminal.header("Área de Edição", "Alterar Nome de Produto")
+    
+                    for c, product in enumerate(products, start=1):
+                        status = product.status.value if hasattr(product.status, "value") else product.status
+                        rows.append(
+                            [
+                                c,
+                                product.name.title(),
+                                product.category.name.capitalize(),
+                                product.stock_quantity,
+                                Terminal.money(product.sale_value),
+                                status,
+                            ]
+                        )
+    
+                    Terminal.header("Produtos cadastrados", "Inventário")
+                    Terminal.table(
+                        ["ID", "Produto", "Categoria", "Estoque", "Venda", "Status"],
+                        rows,
                     )
 
                 Terminal.header("Produtos cadastrados", "Inventário")
@@ -422,16 +424,8 @@ class EditMenu:
                         print('')
                         Terminal.pause()
                         break
-                    else:
-                        Terminal.error(
-                            'Necessário selecionar um produto ou adicionar uma quantidade maior que 0.')
-                        Terminal.pause()
-                        break
-
-                elif user_choice == 4:
-                    break
-        else:
-            Terminal.header("Inventário", "Entrada de Produto")
-            print('Nenhum produto cadastrado.')
-            print()
-            Terminal.pause()
+            else:
+                Terminal.header("Inventário", "Entrada de Produto")
+                print('Nenhum produto cadastrado.')
+                print()
+                Terminal.pause()
