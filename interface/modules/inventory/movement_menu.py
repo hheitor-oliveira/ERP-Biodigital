@@ -1,6 +1,7 @@
 # internal's imports
 from interface.core.terminal import Terminal
 from services.inventory.product_service import ProductService
+from typing import Any
 
 
 class MovementMenu:
@@ -40,7 +41,7 @@ class MovementMenu:
         if products:
             while True:
                 products = self._product_service.list_products()
-                rows = []
+                rows: list[list[Any]] = []
                 Terminal.header("Inventário", "Entrada de Produto")
 
                 for c, product in enumerate(products, start=1):
@@ -125,7 +126,7 @@ class MovementMenu:
             if products:
                 while True:
                     products = self._product_service.list_products()
-                    rows = []
+                    rows: list[list[Any]] = []
                     Terminal.header("Inventário", "Saída Manual de Produto")
     
                     for c, product in enumerate(products, start=1):

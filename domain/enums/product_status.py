@@ -4,4 +4,5 @@ class ProductStatus(Enum):
   '''Classe do tipo ENUM responsável por representar os status existentes dos produtos do sistema.'''
   ACTIVE = "ACTIVE"
   INACTIVE = "INACTIVE"
-  DESCONTINUED = "DESCONTINUED"
+  DISCONTINUED = "DISCONTINUED"
+  
