@@ -1,12 +1,13 @@
 from interface.core.terminal import Terminal
 from services.inventory.product_service import ProductService
-
+from domain.enums.status import Status
+from typing import Any
 
 class EditMenu:
 
     def __init__(self):
         self._product_service = ProductService()
-        self._product_status = ProductStatus
+        self._status = Status
 
     def run(self) -> None:
         while True:
@@ -42,38 +43,38 @@ class EditMenu:
 
     def change_product_name(self):
         
-            Terminal.clear()
-            products = self._product_service.list_products()
-            rows = []
-            chose_product = None
-            chose_product_id = None
-            new_name = None
-            exib_name = None
+        Terminal.clear()
+        products = self._product_service.list_products()
+        rows = []
+        chose_product = None
+        chose_product_id = None
+        new_name = None
+        exib_name = None
     
-            if products:
-                while True:
-                    products = self._product_service.list_products()
-                    rows = []
-                    Terminal.header("Área de Edição", "Alterar Nome de Produto")
+        if products:
+            while True:
+                products = self._product_service.list_products()
+                rows: list[list[Any]] = []
+                Terminal.header("Área de Edição", "Alterar Nome de Produto")
     
-                    for c, product in enumerate(products, start=1):
-                        status = product.status.value if hasattr(product.status, "value") else product.status
-                        rows.append(
-                            [
-                                c,
-                                product.name.title(),
-                                product.category.name.capitalize(),
-                                product.stock_quantity,
-                                Terminal.money(product.sale_value),
-                                status,
-                            ]
-                        )
-    
-                    Terminal.header("Produtos cadastrados", "Inventário")
-                    Terminal.table(
-                        ["ID", "Produto", "Categoria", "Estoque", "Venda", "Status"],
-                        rows,
+                for c, product in enumerate(products, start=1):
+                    status = product.status.value if hasattr(product.status, "value") else product.status
+                    rows.append(
+                        [
+                            c,
+                            product.name.title(),
+                            product.category.name.capitalize(),
+                            product.stock_quantity,
+                            Terminal.money(product.sale_value),
+                            status,
+                        ]
                     )
+    
+                Terminal.header("Produtos cadastrados", "Inventário")
+                Terminal.table(
+                    ["ID", "Produto", "Categoria", "Estoque", "Venda", "Status"],
+                    rows,
+                )
 
                 Terminal.header("Produtos cadastrados", "Inventário")
                 Terminal.table(
@@ -385,18 +386,18 @@ class EditMenu:
 
                 elif user_choice == 2:
                     if chose_product is not None:
-                        Terminal.field(1, 'Ativo', (self._product_status.ACTIVE.name))
-                        Terminal.field(2, 'Inativo', (self._product_status.INACTIVE.name))
-                        Terminal.field(3, 'Descontinuado', (self._product_status.DISCONTINUED.name))
+                        Terminal.field(1, 'Ativo', (self._status.ACTIVE.name))
+                        Terminal.field(2, 'Inativo', (self._status.INACTIVE.name))
+                        Terminal.field(3, 'Descontinuado', (self._status.DISCONTINUED.name))
                         Terminal.field(4, 'Saber mais', '-')
                         user_status_choice = Terminal.ask_option(
                                             "Escolha a opção desejada", range(1, 5))
                         if user_status_choice == 1:
-                            new_product_status = self._product_status.ACTIVE
+                            new_product_status = self._status.ACTIVE
                         elif user_status_choice == 2:
-                            new_product_status = self._product_status.INACTIVE
+                            new_product_status = self._status.INACTIVE
                         elif user_status_choice == 3:
-                            new_product_status = self._product_status.DISCONTINUED
+                            new_product_status = self._status.DISCONTINUED
                         elif user_status_choice == 4:
                             Terminal.clear()
                             Terminal.separator()
@@ -424,8 +425,8 @@ class EditMenu:
                         print('')
                         Terminal.pause()
                         break
-            else:
-                Terminal.header("Inventário", "Entrada de Produto")
-                print('Nenhum produto cadastrado.')
-                print()
-                Terminal.pause()
+        else:
+            Terminal.header("Inventário", "Entrada de Produto")
+            print('Nenhum produto cadastrado.')
+            print()
+            Terminal.pause()

@@ -1,8 +1,9 @@
 # lib's imports
 from decimal import Decimal
+from typing import Any
 
 # internal import's
-from domain.enums.product_status import ProductStatus
+from domain.enums.status import Status
 from domain.inventory.category import Category
 from domain.exceptions.product_exceptions import InvalidStockQuantityError
 
@@ -16,7 +17,7 @@ class Product:
                  cost_price: Decimal,
                  sale_value: Decimal,
                  stock_quantity: int = 0,
-                 product_status: ProductStatus = ProductStatus.ACTIVE,
+                 status: Status = Status.ACTIVE,
                  id: int | None = None
                  ):
     
@@ -26,7 +27,7 @@ class Product:
         self._stock_quantity = stock_quantity
         self._sale_value = sale_value
         self._cost_price = cost_price
-        self._status = product_status
+        self._status = status
 
     @classmethod
     def restore(cls,
@@ -71,7 +72,7 @@ class Product:
         return self._stock_quantity
     
     @property
-    def status(self) -> ProductStatus:
+    def status(self) -> Status:
         return self._status
 
     @property
@@ -103,7 +104,7 @@ class Product:
         self._cost_price = new_cost_price
         
     def change_status(self,
-                          new_status: ProductStatus) -> None:
+                          new_status: Status) -> Any:
         self._status = new_status
         
     def change_category(self,
