@@ -10,7 +10,7 @@ class MainMenu:
 
     def run(self) -> None:
         while True:
-            Terminal.header("SGEC", "Menu principal")
+            Terminal.header("ERP - Biodigital", "Menu principal")
             Terminal.options(
                 [
                     "Inventário",

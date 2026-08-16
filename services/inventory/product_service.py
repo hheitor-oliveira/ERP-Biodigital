@@ -24,9 +24,9 @@ class ProductService:
     
     return product
   
-  def save_information(self, product: Product, chose_product_id: int) -> None:
+  def save_information(self, product: Product) -> None:
     
-    self._product_repository.save_a_edit(product, chose_product_id)
+    self._product_repository.save_a_edit(product)
 
   def list_products(self) -> list[Product]:
      

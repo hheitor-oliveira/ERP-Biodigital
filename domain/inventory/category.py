@@ -1,9 +1,10 @@
 from typing import Self
+from typing import Any
 
 class Category:
   def __init__(self,
                name: str,
-               id: None | int = None):
+               id: Any | int = None):
     self._id = id
     self._name = name
     
@@ -12,7 +13,7 @@ class Category:
     return self._name
   
   @property
-  def id(self) -> None | int:
+  def id(self) -> int:
     return self._id
   
   @classmethod

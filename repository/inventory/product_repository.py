@@ -71,10 +71,10 @@ class ProductRepository:
                 product_sale_value = row[3]
                 product_stock_quantity = row[4]
                 product_status = row[5]
-                category_id = row[6]
-                category_name = row[7]
+                category_name = row[6]
+                category_id = row[7]
                 
-                category = Category.restore(category_id, category_name)
+                category = Category.restore(category_name, category_id)
                 
                 product = Product.restore(product_id, 
                                           product_name, 
@@ -91,7 +91,7 @@ class ProductRepository:
         finally:
             connection.close()
             
-    def save_a_edit(self, product: Product, product_id: int) -> None:
+    def save_a_edit(self, product: Product) -> None:
 
             connection = DatabaseConnection.get_connection()
 
@@ -117,7 +117,7 @@ class ProductRepository:
                         product.sale_value,
                         product.stock_quantity,
                         product.status,
-                        product_id
+                        product.id
                     )
                 )
         
