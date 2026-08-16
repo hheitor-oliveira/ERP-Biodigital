@@ -14,15 +14,16 @@
 ---
 ### **Attribute's**
 
-  - id: int
-  - name: str
+  - id (int)
+  - name (str)
+  - status (enum) -> Status: ACTIVE & INACTIVE
 
 ---
 ### **Rules**
 
-- Em desenvolvimento.
+- Domain Rule Category 01: 
 
 ---
 ### Public Interface
 
-- Em desenvolvimento
+- PBINT01: change_name() -> Responsável por alterar o nome de uma categoria.

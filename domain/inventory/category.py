@@ -1,10 +1,10 @@
-from typing import Self
-from typing import Any
+# lib's import
+import typing
 
 class Category:
   def __init__(self,
                name: str,
-               id: Any | int = None):
+               id: int | None = None):
     self._id = id
     self._name = name
     
@@ -13,13 +13,13 @@ class Category:
     return self._name
   
   @property
-  def id(self) -> int:
+  def id(self) -> int | None:
     return self._id
   
   @classmethod
   def restore(cls,
               name: str,
-              id: int | None) -> Self:
+              id: int | None) -> typing.Self:
     
     category = object.__new__(cls)
     

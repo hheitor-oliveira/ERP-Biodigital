@@ -5,3 +5,4 @@ class Roles(Enum):
   ADMIN = "ADMIN"
   TECHNIQUE = "TECHNIQUE"
   ATTENDANT = "ATTENDANT"
+  

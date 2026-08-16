@@ -1,7 +1,7 @@
 # internal's imports
 from domain.enums.user_roles import Roles
 
-class SystemUser:
+class AppUser:
     '''Classe responsável por representar um usuário no sistema.'''
     def __init__(self,
                  id: int,

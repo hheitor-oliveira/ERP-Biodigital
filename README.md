@@ -1,4 +1,4 @@
-# ERP - Biodigital Technology
+# ERP - Biodigital Technology - V2.0.0
 
 > Um ERP desenvolvido em Python com foco em arquitetura de software, orientação a objetos e boas práticas de desenvolvimento.
 
@@ -23,7 +23,7 @@ Todo o desenvolvimento está sendo realizado de forma incremental, implementando
 ## 🚀 Tecnologias
 
 - Python 3.12
-- PostgreSQL
+- PostgreSQL 18.x
 - Psycopg 3
 - python-dotenv
 
@@ -42,31 +42,6 @@ ERP/
 ```
 
 Cada camada possui uma responsabilidade específica, mantendo o sistema organizado e de fácil manutenção.
-
----
-
-## ⚙️ Funcionalidades
-
-### Produtos
-
-- [x] Cadastro de produtos
-- [x] Persistência em PostgreSQL
-- [ ] Consulta de produtos
-- [ ] Atualização de produtos
-- [ ] Remoção de produtos
-- [ ] Controle de estoque
-
-### Vendas
-
-- [ ] Em desenvolvimento
-
-### Caixa
-
-- [ ] Planejado
-
-### Financeiro
-
-- [ ] Planejado
 
 ---
 

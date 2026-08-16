@@ -3,8 +3,6 @@
 ### **Responsibility's**
 
   - Representar os produtos do sistema.
-  - Fazer validações de entradas e saídas.
-  - Controlar e representar estoque.
 
 ---
 ### **Relationships**
@@ -17,19 +15,24 @@
   - Tipo de Relacionamento: Associação
   - -> Representa o produto dentro de uma um item da movimentação.
 
+##### StockItem
+  - Tipo de Relacionamento: Associação
+  - -> Representa o produto transferido para um estoque, ou entre eles.
+
 ##### Category
   - Tipo de Relacionamento: Composição
   - -> Representa uma categoria que componhe o produto.
+
 ---
 ### **Attribute's**
 
-  - (+) id: int
-  - (+) name: str
-  - (+) category: Category
+  - (#) id: int
+  - (#) name: str
+  - (#) category: Category
   - (#) stock_quantity: int
   - (#) sale_value: Decimal
   - (#) cost_price: Decimal
-  - (+) product_Status: Status (enum) -> Active, Inactive, Descontinued
+  - (#) status: (enum) -> Active, Inactive, Descontinued
 
 ---
 ### **Rules**

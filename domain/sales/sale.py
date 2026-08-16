@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 # internals imports
-from domain.users.system_user import SystemUser
+from domain.users.app_user import SystemUser
 from domain.sales.sale_item import SaleItem
 from domain.sales.sale_payment import SalePayment
 

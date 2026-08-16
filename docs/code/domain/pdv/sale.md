@@ -28,7 +28,8 @@
 ### **Attribute's**
 
   - (#) id: int
-  - (#) items: list[SalePayment]
+  - (#) sale_items : list[SaleItem]
+  - (#) payment_methods: list[SalePayment]
   - (#) user: SystemUser
   - (#) total_value: Decimal
   - (#) discount_type: str
