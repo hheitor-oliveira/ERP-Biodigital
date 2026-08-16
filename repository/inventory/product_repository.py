@@ -49,7 +49,7 @@ class ProductRepository:
                     product.product_name,
                     product.cost_price,
                     product.sale_value,
-                    product.stock_quantity,
+                    product.available_quantity,
                     product.product_status,
                     category.category_name,
                     category.category_id
@@ -69,7 +69,7 @@ class ProductRepository:
                 product_name = row[1]
                 product_cost_price = row[2]
                 product_sale_value = row[3]
-                product_stock_quantity = row[4]
+                product_available_quantity = row[4]
                 product_status = row[5]
                 category_name = row[6]
                 category_id = row[7]
@@ -79,7 +79,7 @@ class ProductRepository:
                 product = Product.restore(product_id, 
                                           product_name, 
                                           category,
-                                          product_stock_quantity, 
+                                          product_available_quantity, 
                                           product_sale_value, 
                                           product_cost_price, 
                                           product_status)
@@ -106,7 +106,7 @@ class ProductRepository:
                         category_id = %s,
                         cost_price = %s,
                         sale_value = %s,
-                        stock_quantity = %s,
+                        available_quantity = %s,
                         product_status = %s
                     WHERE product_id = %s  
                     """,
@@ -115,7 +115,7 @@ class ProductRepository:
                         product.category.id,
                         product.cost_price,
                         product.sale_value,
-                        product.stock_quantity,
+                        product.available_quantity,
                         product.status,
                         product.id
                     )

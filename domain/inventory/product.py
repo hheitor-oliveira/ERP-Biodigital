@@ -5,7 +5,6 @@ from typing import Any
 # internal import's
 from domain.enums.status import Status
 from domain.inventory.category import Category
-from domain.exceptions.product_exceptions import InvalidStockQuantityError
 
 class Product:
     """
@@ -16,7 +15,7 @@ class Product:
                  category: Category,
                  cost_price: Decimal,
                  sale_value: Decimal,
-                 stock_quantity: int = 0,
+                 available_quantity: int = 0,
                  status: Status = Status.ACTIVE,
                  id: int | None = None
                  ):
@@ -24,7 +23,7 @@ class Product:
         self._id = id
         self._name = name
         self._category = category
-        self._stock_quantity = stock_quantity
+        self._available_quantity = available_quantity
         self._sale_value = sale_value
         self._cost_price = cost_price
         self._status = status
@@ -34,7 +33,7 @@ class Product:
                 id: int,
                 name: str,
                 category: Category,
-                stock_quantity: int,
+                available_quantity: int,
                 sale_value: Decimal,
                 cost_price: Decimal,
                 status: str):
@@ -44,7 +43,7 @@ class Product:
         product._id = id
         product._name = name
         product._category = category
-        product._stock_quantity = stock_quantity
+        product._available_quantity = available_quantity
         product._sale_value = sale_value
         product._cost_price = cost_price
         product._status = status
@@ -68,8 +67,8 @@ class Product:
         return self._sale_value
     
     @property
-    def stock_quantity(self) -> int:
-        return self._stock_quantity
+    def available_quantity(self) -> int:
+        return self._available_quantity
     
     @property
     def status(self) -> Status:
@@ -79,17 +78,9 @@ class Product:
     def id(self) -> int | None:
         return self._id
 
-    def add_stock(self, quantity: int) -> None:
-        if quantity <= 0:
-            raise InvalidStockQuantityError(
-            "A quantidade deve ser maior que zero."
-        )
-
-        self._stock_quantity += quantity
-    
-    def remove_stock(self,
-                     quantity: int) -> None:
-        self._stock_quantity -= quantity
+    def add_stock(self, 
+                  quantity: int) -> None:
+        self._available_quantity += quantity
     
     def change_name(self,
                     new_name: str) -> None:
