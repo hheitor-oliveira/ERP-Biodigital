@@ -62,7 +62,10 @@ APP_USER 1 ─── N MOVEMENT
 
 APP_USER 1 ─── N SALE
 ```
-
+CheckConstraint(
+            "cost_price >= 0",
+            name="product_cost_price_check"
+        ),
 ---
 
 ## 3. PRODUCT
@@ -223,6 +226,8 @@ A movimentação representa a operação realizada, enquanto seus produtos e qua
 - from_stock_id — Estoque de origem.
 - to_stock_id — Estoque de destino.
 - movement_type — Tipo da movimentação.
+- date - Registro do horário da movimentação
+
 
 ### Chave Primária
 
@@ -403,6 +408,9 @@ Representa um pagamento associado a uma venda.
   - OTHER
 
 ### Relacionamento
+                               ▼                  ▼
+                         ┌────────────┐    ┌──────────────┐
+                         │  APP_USER 
 
 ```text
 SALE 1 ─── N SALE_PAYMENT
@@ -435,6 +443,9 @@ SALE 1 ─── N SALE_PAYMENT
               ▼                 ▼                 ▼
         ┌───────────┐     ┌──────────┐       ┌─────────┐
         │   STOCK   │     │ MOVEMENT │       │  SALE   │
+                               ▼                  ▼
+                         ┌────────────┐    ┌──────────────┐
+                         │  APP_USER 
         └───────────┘     └────┬─────┘       └────┬────┘
                                │                  │
                                │ N:1              │ 1:N
@@ -480,7 +491,7 @@ available_quantity = 20
 
         │
         │ distribuição
-        ▼
+        ▼product_cost_price_check"
 
 STOCK_ITEM
 
@@ -497,7 +508,7 @@ STOCK_ITEM
 
 ```text
 MOVEMENT
-   │
+   │product_cost_price_check"
    ├── usuário responsável
    │
    ├── estoque de origem

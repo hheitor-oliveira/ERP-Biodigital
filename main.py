@@ -1,8 +1,3 @@
-from interface.modules.main_menu import MainMenu
-
 def main():
-    menu = MainMenu()
-    menu.run()
-
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()
