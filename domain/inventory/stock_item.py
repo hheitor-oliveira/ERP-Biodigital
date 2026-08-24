@@ -6,8 +6,8 @@ class StockItem:
   
   def __init__(self,
                stock: Stock,
+               products: Product,
                quantity: int = 1,
-               products: list[Product] | None = None,
                id: int | None = None,
               ):
     
@@ -22,10 +22,10 @@ class StockItem:
   
   @property 
   def stock(self) -> Stock:
-    return self.stock
+    return self._stock
   
   @property
-  def products(self) -> list[Product] | None:
+  def product(self) -> Product:
     return self._products
   
   @property

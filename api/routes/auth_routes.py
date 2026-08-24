@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from schemas.user_schema import CreateUserSchema
-from repository.users.user_repository import UserRepository
+from services.users.user_service import UserService
 from sqlalchemy.orm import Session
-from database.connection import open_session
+from api.dependencies import get_session
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -11,8 +11,8 @@ auth_router = APIRouter(
 
 @auth_router.post("/create_user")
 async def criar_usuario(user: CreateUserSchema,
-                        session: Session = Depends(open_session)
+                        session: Session = Depends(get_session)
                         ):
-                          
-  UserRepository.create_user(user, session)
-  
+
+  user_service = UserService(session)
+  user_service.create_user(user.name, user.email, user.password)

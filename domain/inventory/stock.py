@@ -16,7 +16,26 @@ class Stock:
     self._status = status
     self._description = description
     self._id = id
+  
+  @classmethod
+  def restore(cls,
+              id: int,
+              name: str,
+              description: str,
+              products: list[StockItem],
+              status: StatusEnum
+              ):
     
+    stock = object.__new__(cls)
+    
+    stock._id = id
+    stock._name = name
+    stock._description = description
+    stock._products = products
+    stock._status = status
+    
+    return stock
+   
   @property
   def name(self) -> str:
     return self._name
@@ -36,3 +55,31 @@ class Stock:
   @property
   def id(self) -> int | None:
     return self._id
+  
+  def change_name(self, new_name: str):
+    self._name = new_name
+    
+  def change_description(self, new_description: str):
+    self._description = new_description
+    
+  def change_status(self, new_status: StatusEnum):
+    self._status = new_status
+    
+  def add_product(self, product: StockItem):
+    if self._products is None:
+        self._products = []
+    self._products.append(product)
+    
+  def remove_product(self, product: StockItem):
+    if product.id is None:
+        raise TypeError('Produto não encontrado.')
+
+    if self._products is None:
+        self._products = []
+
+    for stock_item in self._products:
+        if stock_item.product.id == product.id:
+            self._products.remove(stock_item)
+            return
+
+    raise ValueError('Produto não encontrado no estoque.')

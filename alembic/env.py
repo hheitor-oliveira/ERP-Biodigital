@@ -3,17 +3,12 @@
 import os
 from logging.config import fileConfig
 
-from dotenv import load_dotenv
-
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
 
-
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL")
+from config.settings import DATABASE_URL
 
 if DATABASE_URL is None:
     raise RuntimeError("DATABASE_URL não foi definida")

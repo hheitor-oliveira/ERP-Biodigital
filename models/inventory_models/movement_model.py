@@ -1,5 +1,5 @@
 from models.base import Base
-from domain.enums.movement_type import MovementType
+from models.model_enums import ModelMovementTypeEnum
 from sqlalchemy import Enum as SQLEnum
 from datetime import datetime
 from sqlalchemy import ForeignKey,DateTime, func
@@ -29,8 +29,8 @@ class MovementModel(Base):
     nullable = False
   )
   
-  movement_type: Mapped[MovementType] = mapped_column(
-    SQLEnum(MovementType),
+  movement_type: Mapped[ModelMovementTypeEnum] = mapped_column(
+    SQLEnum(ModelMovementTypeEnum),
     nullable = False
   )
   

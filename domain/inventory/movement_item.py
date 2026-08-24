@@ -10,6 +10,19 @@ class MovementItem:
                quantity: int,
                id: int | None = None
                ) -> None:
-    self.id = id
-    self.product = product
-    self.quantity = quantity
+    
+    self._id = id
+    self._product = product
+    self._quantity = quantity
+    
+  @property
+  def id(self) -> int | None:
+    return self._id
+  
+  @property
+  def quantity(self) -> int:
+    return self._quantity
+  
+  @property
+  def product(self) -> Product:
+    return self.product

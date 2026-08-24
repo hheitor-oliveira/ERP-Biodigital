@@ -195,3 +195,4 @@ O modulo de inventario possui persistencia funcional com PostgreSQL. Os modulos 
 ## Licenca
 
 Este projeto esta licenciado sob a licenca MIT.
+referência

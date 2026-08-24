@@ -1,5 +1,5 @@
 from models.base import Base
-from domain.enums.status import StatusEnum
+from models.model_enums import ModelStatusEnum
 from sqlalchemy import Enum as SQLEnum
 from decimal import Decimal
 from sqlalchemy import ForeignKey, Numeric, String, CheckConstraint
@@ -37,8 +37,8 @@ class ProductModel(Base):
     nullable = False
   )
   
-  product_status: Mapped[StatusEnum] = mapped_column(
-    SQLEnum(StatusEnum),
+  product_status: Mapped[ModelStatusEnum] = mapped_column(
+    SQLEnum(ModelStatusEnum),
     nullable = False,
     server_default = 'ACTIVE'
   )

@@ -26,6 +26,25 @@ class Movement:
         self._movement_type = movement_type
         self._movement_date: datetime = movement_date
 
+    @classmethod
+    def restore(cls,
+                id: int,
+                user: AppUser,
+                movement_type: MovementType,
+                movement_date: datetime,
+                items: list[MovementItem]
+                ):
+        
+        movement = object.__new__(cls)
+        
+        movement._id = id
+        movement._user = user
+        movement._movement_type = movement_type
+        movement._movement_date = movement_date
+        movement._items = items    
+        
+        return movement
+
     @property
     def id(self) -> int | None:
         return self._id
