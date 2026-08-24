@@ -1,4 +1,3 @@
-from sqlalchemy.orm import Session # type: ignore
 from database.connection import SessionLocal
 
 def get_session():
