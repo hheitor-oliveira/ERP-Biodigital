@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Any
 
 # internal import's
-from domain.enums.status import Status
+from domain.enums.status import StatusEnum
 from domain.inventory.category import Category
 
 class Product:
@@ -16,7 +16,7 @@ class Product:
                  cost_price: Decimal,
                  sale_value: Decimal,
                  available_quantity: int = 0,
-                 status: Status = Status.ACTIVE,
+                 status: StatusEnum = StatusEnum.ACTIVE,
                  id: int | None = None
                  ):
     
@@ -71,7 +71,7 @@ class Product:
         return self._available_quantity
     
     @property
-    def status(self) -> Status:
+    def status(self) -> StatusEnum:
         return self._status
 
     @property
@@ -95,7 +95,7 @@ class Product:
         self._cost_price = new_cost_price
         
     def change_status(self,
-                          new_status: Status) -> Any:
+                          new_status: StatusEnum) -> Any:
         self._status = new_status
         
     def change_category(self,

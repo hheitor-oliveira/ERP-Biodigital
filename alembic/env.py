@@ -35,7 +35,7 @@ from models.inventory_models.movement_model import MovementModel
 from models.inventory_models.product_model import ProductModel
 from models.inventory_models.stock_item_model import StockItemModel
 from models.inventory_models.stock_model import StockModel
-from models.user_model.app_user import AppUserModel
+from models.user_model.user_model import UserModel
 
 from models.base import Base
 

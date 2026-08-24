@@ -2,7 +2,7 @@ from models.base import Base
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-class AppUserModel(Base):
+class UserModel(Base):
   
   __tablename__ = 'app_user'
   
@@ -23,6 +23,10 @@ class AppUserModel(Base):
   )
   
   user_password: Mapped[str] = mapped_column(
-    String(256),
+    nullable = False
+  )
+  
+  admin: Mapped[bool] = mapped_column(
+    server_default = 'FALSE',
     nullable = False
   )

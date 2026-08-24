@@ -1,12 +1,30 @@
 import os
+
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
 
-if DATABASE_URL is None:
-    raise RuntimeError('As credenciais passadas estão inválidas. Conexão não realizada.')
+def connection():
+    database_url = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL)
+    if database_url is None:
+        raise RuntimeError("DATABASE_URL não configurada")
+
+    return create_engine(database_url)
+
+
+db = connection()
+
+SessionLocal = sessionmaker(bind=db)
+
+
+def open_session():
+    session = SessionLocal()
+
+    try:
+        yield session
+    finally:
+        session.close()

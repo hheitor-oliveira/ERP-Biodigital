@@ -1,6 +1,6 @@
 # internal's imports
 from domain.inventory.stock_item import StockItem
-from domain.enums.status import Status
+from domain.enums.status import StatusEnum
 
 class Stock:
   
@@ -9,7 +9,7 @@ class Stock:
                description: str,
                products: list[StockItem] | None = None,
                id: int | None = None,
-               status: Status = Status.ACTIVE):
+               status: StatusEnum = StatusEnum.ACTIVE):
     
     self._name = name
     self._products = products
@@ -26,7 +26,7 @@ class Stock:
     return self._description
   
   @property
-  def status(self) -> Status:
+  def status(self) -> StatusEnum:
     return self._status
   
   @property

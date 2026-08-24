@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 # internals imports
-from domain.users.app_user import SystemUser
+from domain.users.app_user import AppUser
 from domain.sales.sale_item import SaleItem
 from domain.sales.sale_payment import SalePayment
 
@@ -14,7 +14,7 @@ class Sale:
                  id: int,
                  items: list[SaleItem],
                  sale_payment: list[SalePayment],
-                 user: SystemUser,
+                 user: AppUser,
                  total_value: Decimal,
                  discount_type: int,
                  discount_value: Decimal,
