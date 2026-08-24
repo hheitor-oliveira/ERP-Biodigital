@@ -6,5 +6,3 @@ class CreateUserSchema(BaseModel):
     name: str
     email: str
     password: str
-
-# GET SCHEMA
