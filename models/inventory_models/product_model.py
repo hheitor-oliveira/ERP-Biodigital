@@ -39,7 +39,6 @@ class ProductModel(Base):
   
   product_status: Mapped[ModelStatusEnum] = mapped_column(
     SQLEnum(ModelStatusEnum),
-    nullable = False,
     server_default = 'ACTIVE'
   )
   

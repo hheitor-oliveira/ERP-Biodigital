@@ -268,7 +268,7 @@ O `main.py` não expõe o objeto `app`. O README diz para rodar `uvicorn main:ap
 from api.api import app
 ```
 
-**Status:** [ ] Pendente
+**Status:** [X] Realizado
 
 ---
 
@@ -284,7 +284,7 @@ Adicionar `@classmethod restore()` e métodos de comportamento.
 - `change_description(new_description)` → altera descrição
 - `change_status(new_status)` → altera status
 
-**Status:** [ ] Pendente
+**Status:** [X] Realizado
 
 ### 1.2 `domain/inventory/stock_item.py`
 
@@ -294,7 +294,7 @@ Adicionar `@classmethod restore()`.
 - `restore(id, stock, quantity, products)` → reconstitui do banco
 - `change_quantity(new_quantity)` → altera quantidade
 
-**Status:** [ ] Pendente
+**Status:** [X] Realizado
 
 ### 1.3 `domain/inventory/movement.py`
 
@@ -303,7 +303,7 @@ Adicionar `@classmethod restore()`.
 **Métodos necessários:**
 - `restore(id, user, movement_type, movement_date, items)` → reconstitui do banco
 
-**Status:** [ ] Pendente
+**Status:** [X] Realizado
 
 ### 1.4 `domain/inventory/movement_item.py`
 
@@ -312,7 +312,7 @@ Adicionar `@classmethod restore()` (após correção da Fase 0.2).
 **Métodos necessários:**
 - `restore(id, product, quantity)` → reconstitui do banco
 
-**Status:** [ ] Pendente
+**Status:** [X] Realizado
 
 ---
 
@@ -331,7 +331,7 @@ Os repositórios de `category_repository.py` e `product_repository.py` usam `Dat
 
 **Recomendação: Opção A** — padronizar tudo em SQLAlchemy ORM.
 
-**Status:** [ ] Pendente
+**Status:** [X] Realizado
 
 ---
 

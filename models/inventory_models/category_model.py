@@ -2,7 +2,7 @@ from models.base import Base
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
-from models.model_enums import ModelStatusEnum
+from domain.enums.status import StatusEnum
 
 class CategoryModel(Base):
   
@@ -17,8 +17,8 @@ class CategoryModel(Base):
     nullable = False
   )
   
-  category_status: Mapped[str] = mapped_column(
-    SQLEnum(ModelStatusEnum),
+  category_status: Mapped[StatusEnum] = mapped_column(
+    SQLEnum(StatusEnum),
     nullable = False,
     server_default = 'ACTIVE'
   )
