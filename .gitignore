@@ -44,3 +44,5 @@ Thumbs.db
 # I.A
 # ==========================
 AGENT.md
+.hermes/
+.specify/
