@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from decimal import Decimal
+from domain.enums.status import StatusEnum
 
 class CreateProductSchema(BaseModel):
   
@@ -8,11 +9,22 @@ class CreateProductSchema(BaseModel):
   cost_price: Decimal
   sale_value: Decimal
 
-class ProductResponseSchema(BaseModel):
+class CategoryResponse(BaseModel):
+  
+  model_config = ConfigDict(from_attributes=True)
+  
   id: int
   name: str
-  category: str
+  status: StatusEnum
+
+class ProductResponseSchema(BaseModel):
+  
+  model_config = ConfigDict(from_attributes=True)
+  
+  id: int
+  name: str
+  category: CategoryResponse
   cost_price: Decimal
   sale_value: Decimal
-  status: str
+  status: StatusEnum
   available_quantity: int

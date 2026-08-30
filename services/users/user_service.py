@@ -1,7 +1,7 @@
 from repository.users.user_repository import UserRepository
 from sqlalchemy.orm import Session
 from domain.users.app_user import AppUser
-from config.security import pwd_context
+from api.dependencies import pwd_context
 
 class UserService:
     

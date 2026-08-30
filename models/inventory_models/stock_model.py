@@ -1,5 +1,5 @@
 from models.base import Base
-from models.model_enums import ModelStatusEnum
+from domain.enums.status import StatusEnum
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -19,8 +19,8 @@ class StockModel(Base):
     unique = True,
   )
   
-  stock_status: Mapped[ModelStatusEnum] = mapped_column(
-    SQLEnum(ModelStatusEnum),
+  stock_status: Mapped[StatusEnum] = mapped_column(
+    SQLEnum(StatusEnum),
     nullable = False,
     server_default = 'ACTIVE'
   )
