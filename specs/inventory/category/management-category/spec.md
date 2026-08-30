@@ -61,7 +61,7 @@ Como responsável pela manutenção do inventário, quero editar o nome e o stat
 
 ## Edge Cases
 
-- O sistema deve tratar nomes com diferenças apenas de caixa e espaços como duplicidade quando isso comprometer a distinção prática entre categorias.
+- O sistema deve normalizar os nomes removendo espaços no início e no fim, colapsando espaços internos repetidos e convertendo o texto para maiúsculas; nomes com a mesma forma normalizada devem ser tratados como duplicidade.
 - O sistema deve impedir que uma categoria seja criada ou atualizada com um nome que não seja significativo para identificação do grupo.
 - O sistema deve preservar categorias já utilizadas por produtos, evitando exclusão física para não quebrar o histórico de classificação.
 - O sistema deve permitir que categorias inativas continuem sendo consultadas para fins de histórico e auditoria.
@@ -71,7 +71,7 @@ Como responsável pela manutenção do inventário, quero editar o nome e o stat
 ### Functional Requirements
 
 - **FR-001**: O sistema deve permitir o cadastro de uma nova categoria de produto com nome obrigatório.
-- **FR-002**: O sistema deve impedir o cadastro de categorias com nome duplicado, considerando equivalência entre letras maiúsculas e minúsculas e ignorando espaços no início e no fim do nome.
+- **FR-002**: O sistema deve impedir o cadastro de categorias com nome duplicado, considerando a forma normalizada do nome: espaços no início e no fim são removidos, espaços internos repetidos são colapsados e letras são convertidas para maiúsculas.
 - **FR-003**: O sistema deve validar o nome da categoria antes de aceitar o cadastro ou a alteração.
 - **FR-004**: O sistema deve permitir a consulta de todas as categorias cadastradas.
 - **FR-005**: O sistema deve exibir o status de cada categoria nas consultas.

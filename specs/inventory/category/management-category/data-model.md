@@ -14,8 +14,9 @@ Represents a product grouping used to classify inventory items consistently.
 - name is required
 - name must contain between 5 and 32 characters
 - name must not be blank or whitespace-only
+- name is normalized by trimming leading and trailing whitespace, collapsing repeated internal whitespace, and converting letters to uppercase
 - name must be unique by business meaning
-- name comparison must ignore case and surrounding whitespace when checking duplicates
+- name comparison must use the normalized name when checking duplicates
 - status must be one of the supported lifecycle states
 
 ### State Transitions
@@ -48,8 +49,8 @@ Represents an inventory item that belongs to a category.
 Represents the lifecycle state of a category.
 
 ### Supported Values
-- active
-- inactive
+- ACTIVE
+- INACTIVE
 
 ### Behavioral Rules
 - active categories may be selected for normal inventory classification

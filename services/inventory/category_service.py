@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
+from domain.enums.status import StatusEnum
 from domain.inventory.category import Category
 from models.inventory_models.category_model import CategoryModel
 from repository.inventory.category_repository import CategoryRepository
@@ -36,6 +37,17 @@ class CategoryService:
             session,
         )
 
+        if existing_category is None:
+            existing_category = next(
+                (
+                    category
+                    for category in CategoryRepository.find_all_categories(session)
+                    if CategoryService.normalize_name(category.category_name)
+                    == normalized_name
+                ),
+                None,
+            )
+
         if existing_category is not None and existing_category.category_id != exclude_id:
             raise ValueError("Category name already exists.")
 
@@ -61,3 +73,46 @@ class CategoryService:
             CategoryService.to_domain_category(category_model)
             for category_model in category_models
         ]
+
+    @staticmethod
+    def list_all_categories(session: Session) -> list[Category]:
+        category_models = CategoryRepository.find_all_categories(session)
+        return CategoryService.to_domain_category_list(list(category_models))
+
+    @staticmethod
+    def rename_category(
+        category_id: int,
+        new_name: str,
+        session: Session,
+    ) -> CategoryModel:
+        category_model = CategoryRepository.find_category_by_id(category_id, session)
+        if category_model is None:
+            raise ValueError("Category not found.")
+
+        CategoryService.ensure_category_name_is_available(
+            new_name,
+            session,
+            exclude_id=category_id,
+        )
+        normalized_name = CategoryService.validate_name(new_name)
+        return CategoryRepository.update_category_name(
+            category_model,
+            normalized_name,
+            session,
+        )
+
+    @staticmethod
+    def change_category_status(
+        category_id: int,
+        new_status: StatusEnum,
+        session: Session,
+    ) -> CategoryModel:
+        category_model = CategoryRepository.find_category_by_id(category_id, session)
+        if category_model is None:
+            raise ValueError("Category not found.")
+
+        return CategoryRepository.update_category_status(
+            category_model,
+            new_status,
+            session,
+        )

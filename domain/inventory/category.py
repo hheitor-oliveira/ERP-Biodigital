@@ -9,7 +9,7 @@ class Category:
         name: str,
         id: int | None = None,
         status: StatusEnum = StatusEnum.ACTIVE,
-    ):
+    ) -> None:
         self._id = id
         self._name = self._normalize_name(name)
         self._status = status
