@@ -7,9 +7,9 @@ from schemas.category_schema import (
     CategoryStatusUpdateSchema,
 )
 from services.inventory.category_service import CategoryService
-from api.dependencies import get_session
+from api.dependencies import get_session, verify_access_token
 
-category_router = APIRouter(prefix='/category',tags=['category'])
+category_router = APIRouter(prefix='/category',tags=['category'], dependencies=[Depends(verify_access_token)])
 
 @category_router.get('/list',
                       response_model=list[CategoryResponseSchema])

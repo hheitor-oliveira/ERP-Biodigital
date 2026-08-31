@@ -4,6 +4,7 @@ class AppUser:
                  name: str,
                  email: str,
                  password: str,
+                 admin: bool,
                  id: int | None = None
                 ):
                  
@@ -11,6 +12,7 @@ class AppUser:
         self._name = name
         self._email = email
         self._password = password
+        self._admin = admin
         
     @property
     def id(self) -> int | None:
@@ -27,3 +29,7 @@ class AppUser:
     @property
     def password(self) -> str:
         return self._password
+    
+    @property
+    def admin(self) -> bool:
+        return self._admin

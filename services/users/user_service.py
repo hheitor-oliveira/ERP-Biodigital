@@ -9,11 +9,12 @@ class UserService:
                     name: str,
                     email: str,
                     password: str,
+                    admin: bool,
                     session: Session
                     ):
         
         password_hash = pwd_context.hash(password) # type: ignore
         
-        user = AppUser(name, email, password_hash) # type: ignore
+        user = AppUser(name, email, password_hash, admin) # type: ignore
         
         UserRepository.create_user(user, session)

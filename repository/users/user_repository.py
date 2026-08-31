@@ -12,7 +12,8 @@ class UserRepository:
         user_model = UserModel(
             user_name = user.name,
             user_email = user.email,
-            user_password = user.password
+            user_password = user.password,
+            admin = user.admin
         )
         
         session.add(user_model)
