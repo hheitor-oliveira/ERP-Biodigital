@@ -1,6 +1,8 @@
 # Tasks: Gerenciamento de Categorias
 
-**Input**: Design documents from `/specs/inventory/category/management-category/`
+**Input**: Design documents from `/specs/inventory-specs/category-spec/management-category/`
+
+**Status**: Completed
 
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
@@ -53,7 +55,7 @@
 ### Implementation for User Story 1
 
 - [X] T010 [US1] Implement category creation workflow and duplicate-name rejection in `services/inventory/category_service.py`
-- [ ] T011 [US1] Wire the create-category endpoint and return payload in `api/routes/inventory_routes/category_routes.py`
+- [X] T011 [US1] Wire the create-category endpoint and return payload in `api/routes/inventory_routes/category_routes.py`
 
 **Checkpoint**: Category creation should work independently and reject invalid duplicates
 
@@ -67,12 +69,12 @@
 
 ### Tests for User Story 2
 
-- [ ] T012 [P] [US2] Create automated integration tests for category listing covering active, inactive, and empty-list cases in `tests/integration/test_category_list.py`
+- [X] T012 [P] [US2] Create automated integration tests for category listing covering active, inactive, and empty-list cases in `tests/integration/test_category_list.py`
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Implement category listing behavior that returns active and inactive categories in `services/inventory/category_service.py`
-- [ ] T014 [US2] Wire the list endpoint response mapping in `api/routes/inventory_routes/category_routes.py` and `schemas/category_schema.py`
+- [X] T013 [US2] Implement category listing behavior that returns active and inactive categories in `services/inventory/category_service.py`
+- [X] T014 [US2] Wire the list endpoint response mapping in `api/routes/inventory_routes/category_routes.py` and `schemas/category_schema.py`
 
 **Checkpoint**: Category listing should work independently of create/update flows
 
@@ -86,13 +88,13 @@
 
 ### Tests for User Story 3
 
-- [ ] T015 [P] [US3] Create automated integration tests for renaming categories and rejecting duplicate names in `tests/integration/test_category_update.py`
-- [ ] T016 [P] [US3] Create automated integration tests for inactivating categories with linked products while preserving associations in `tests/integration/test_category_status.py`
+- [X] T015 [P] [US3] Create automated integration tests for renaming categories and rejecting duplicate names in `tests/integration/test_category_update.py`
+- [X] T016 [P] [US3] Create automated integration tests for inactivating categories with linked products while preserving associations in `tests/integration/test_category_status.py`
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Implement rename and active/inactive transition rules without blocking linked products in `services/inventory/category_service.py`
-- [ ] T018 [US3] Wire update and status-change endpoints in `api/routes/inventory_routes/category_routes.py`
+- [X] T017 [US3] Implement rename and active/inactive transition rules without blocking linked products in `services/inventory/category_service.py`
+- [X] T018 [US3] Wire update and status-change endpoints in `api/routes/inventory_routes/category_routes.py`
 
 **Checkpoint**: Category maintenance actions should work without removing historical references
 
@@ -102,8 +104,8 @@
 
 **Purpose**: Final validation and consistency checks across the whole feature
 
-- [ ] T019 [P] Validate create, list, rename, and inactivate scenarios end to end using `specs/inventory/category/management-category/quickstart.md`
-- [ ] T020 [P] Review and align feature documentation in `specs/inventory/category/management-category/spec.md`, `data-model.md`, and `contracts/category-api.md`
+- [X] T019 [P] Validate create, list, rename, and inactivate scenarios end to end using `specs/inventory-specs/category-spec/management-category/quickstart.md`
+- [X] T020 [P] Review and align feature documentation in `specs/inventory-specs/category-spec/management-category/spec.md`, `data-model.md`, and `contracts/category-api.md`
 
 ---
 
@@ -193,3 +195,4 @@ With multiple developers:
 - Preserve historical product links when inactivating categories
 - Avoid physical deletion as the standard lifecycle path
 - Automated tests are in scope and should trace back to user stories and acceptance criteria
+- All tasks T001-T020 are considered completed for this feature.
