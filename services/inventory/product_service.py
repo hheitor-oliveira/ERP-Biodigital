@@ -31,7 +31,7 @@ class ProductService():
                     sale_value,
                     )
     
-    ProductRepository.create_user(product, session)
+    ProductRepository.create_product(product, session)
     
   @classmethod
   def list_products(cls,

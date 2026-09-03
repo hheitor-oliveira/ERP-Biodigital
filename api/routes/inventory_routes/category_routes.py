@@ -22,7 +22,7 @@ async def produtos(
   category_responses: list[CategoryResponseSchema] = []
   for category in categories:
     if category.id is None:
-      raise RuntimeError("Persisted category must have an id.")
+      raise RuntimeError("Nenhuma categoria encontrada. Cadastre uma.")
     category_responses.append(
         CategoryResponseSchema(
             id=category.id,
@@ -33,11 +33,8 @@ async def produtos(
 
   return category_responses
 
-@category_router.post('/create',
-                      response_model=CategoryResponseSchema)
-async def criar_categoria(category: CategoryCreateSchema,
-                          session: Session = Depends(get_session),
-                          ) -> CategoryResponseSchema:
+@category_router.post('/create', response_model=CategoryResponseSchema)
+async def criar_categoria(category: CategoryCreateSchema, session: Session = Depends(get_session)) -> CategoryResponseSchema:
   try:
     created_category = CategoryService.create_category(category.name, session)
   except ValueError as error:

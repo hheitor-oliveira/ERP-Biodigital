@@ -32,7 +32,7 @@ def get_access_token(sub: int, duracao_token: timedelta=timedelta(TOKEN_EXPIRE_T
 
     return encoded_jwt
 
-def verify_access_token(token: str = Depends(oauth2_schema) ,session: Session  = Depends(get_session)):
+def verify_access_token(token: str = Depends(oauth2_schema), session: Session  = Depends(get_session)):
     
     try:
         dic_info = jwt.decode(token, SECRET_KEY, ALGORITHM) # type: ignore

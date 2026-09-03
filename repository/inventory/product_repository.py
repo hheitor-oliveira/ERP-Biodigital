@@ -7,7 +7,7 @@ from typing import Sequence
 class ProductRepository:
     
     @classmethod
-    def create_user(cls,
+    def create_product(cls,
                     product: Product,
                     session: Session):
       
