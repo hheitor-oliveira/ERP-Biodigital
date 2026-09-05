@@ -24,7 +24,7 @@ description: "Actionable implementation tasks for Product Management"
 **Purpose**: Establish the implementation and validation baseline without adding dependencies or changing the existing authentication mechanism.
 
 - [x] T001 Confirm the existing Product, Category, StatusEnum, authentication, database-session, and test-fixture conventions in `domain/`, `models/`, `services/`, `repository/`, `api/`, and `tests/conftest.py`
-- [ ] T002 [P] Define the product-management test markers and PostgreSQL test-database configuration in `pytest.ini`
+- [x] T002 [P] Define the product-management test markers and PostgreSQL test-database configuration in `pytest.ini`
 - [ ] T003 [P] Document the product migration and validation commands from `specs/inventory-specs/product-spec/quickstart.md` in `docs/code/inventory/product-management.md`
 
 ---
@@ -35,12 +35,12 @@ description: "Actionable implementation tasks for Product Management"
 
 **CRITICAL**: No user-story implementation should begin until this phase is complete.
 
-- [ ] T004 [P] Add typed product-domain exceptions for validation, not-found, duplicate-name, invalid-category, invalid-transition, and deletion-rejected cases in `domain/exceptions/__init__.py`
-- [ ] T005 [P] Implement canonical product-name normalization and validation helpers in `domain/inventory/product.py` for trimming, collapsing whitespace, rejecting blank names, and uppercasing
-- [ ] T006 [P] Implement typed Decimal monetary validation and non-negative quantity/status invariants in `domain/inventory/product.py`
-- [ ] T007 Update the Product aggregate's typed restore, field-change, status-transition, and capability methods in `domain/inventory/product.py` without implementing stock movement or sale execution
-- [ ] T008 Update the SQLAlchemy product mapping and constraints in `models/inventory_models/product_model.py` for canonical-name uniqueness, required fields, non-negative prices and quantity, explicit defaults, foreign key integrity, and valid statuses
-- [ ] T009 Create the Alembic migration in `alembic/versions/<new_product_management_revision>.py` for the Product schema constraints and canonical-name persistence, including upgrade and downgrade paths
+- [x] T004 [P] Add typed product-domain exceptions for validation, not-found, duplicate-name, invalid-category, invalid-transition, and deletion-rejected cases in `domain/exceptions/__init__.py`
+- [x] T005 [P] Implement canonical product-name normalization and validation helpers in `domain/inventory/product.py` for trimming, collapsing whitespace, rejecting blank names, and uppercasing
+- [x] T006 [P] Implement typed Decimal monetary validation and non-negative quantity/status invariants in `domain/inventory/product.py`
+- [x] T007 Update the Product aggregate's typed restore, field-change, status-transition, and capability methods in `domain/inventory/product.py` without implementing stock movement or sale execution
+- [x] T008 Update the SQLAlchemy product mapping and constraints in `models/inventory_models/product_model.py` for canonical-name uniqueness, required fields, non-negative prices and quantity, explicit defaults, foreign key integrity, and valid statuses
+- [x] T009 Create the Alembic migration in `alembic/versions/<new_product_management_revision>.py` for the Product schema constraints and canonical-name persistence, including upgrade and downgrade paths
 - [ ] T010 Refactor shared category-to-domain conversion and active-category validation at the existing Category boundary in `services/inventory/category_service.py`, preserving existing Category behavior
 - [ ] T011 Define typed Product response, create, query-filter, update, and status request schemas in `schemas/product_schema.py` with Decimal precision and enum validation
 - [ ] T012 Centralize authenticated-user and admin dependency usage in `api/dependencies.py`; keep product-domain error-to-HTTP mapping explicit in `api/routes/inventory_routes/product_routes.py`
