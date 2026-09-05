@@ -9,7 +9,7 @@ from domain.exceptions import (
     ProductNotFoundError,
     ProductValidationError,
 )
-from domain.inventory.product import Product
+from domain.inventory.product import Product, normalize_product_name
 from models.inventory_models.product_model import ProductModel
 from services.inventory.category_service import CategoryService
 from services.inventory.product_service import ProductService
@@ -27,7 +27,7 @@ def create_product(
 ) -> ProductModel:
     product = ProductModel(
         category_id=category_id,
-        product_name=name,
+        product_name=normalize_product_name(name),
         cost_price=Decimal("10.00"),
         sale_value=Decimal("15.00"),
         available_quantity=3,

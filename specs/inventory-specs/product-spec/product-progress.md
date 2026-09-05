@@ -2,6 +2,7 @@
 
 ## What Was Done
 
+- Completed T042 by reviewing all Product functions, methods, route handlers, repositories, and schemas listed for the task. All parameters and return values have explicit type annotations; no source-code change was necessary.
 - Completed T035 by canonicalizing names in `UpdateProductSchema` before service/domain processing and explicitly serializing Product monetary response fields as two-decimal strings through Pydantic field serializers.
 - The Product domain already enforced canonicalization through `normalize_product_name()` in construction, restore, and `change_name()`; no additional domain change was required.
 - Completed T028 by implementing prospective-state product updates across `repository/inventory/product_repository.py` and `services/inventory/product_service.py`.
@@ -84,10 +85,18 @@
 
 ## Where It Stopped
 
+- T042 is complete. The annotation audit found no missing parameter or return annotations in the six required Product files, and no implementation change was required.
+- T040 is complete. Implemented `PATCH /product/{product_id}/status` in `api/routes/inventory_routes/product_routes.py` using `ProductStatusUpdateSchema`, `ProductService.change_product_status()`, complete Product response serialization, and explicit product-domain error mapping.
+- Status enum validation remains handled by Pydantic with `422` responses, while missing products map to `404`, invalid transitions and inactive-category reactivation map to `400`, and authentication/admin failures are enforced by the existing dependencies.
 - T037 is complete. Created `tests/integration/test_product_status.py` with coverage for allowed transitions, idempotent transitions, active-category reactivation, invalid transitions, inactive-category reactivation rejection, missing products, invalid statuses, record preservation, and status-dependent stock/sale capability predicates.
 - T036 is complete. Added contract coverage for `PATCH /product/{product_id}/status` in `tests/contract/test_product_management.py`.
 - The new contract coverage exercises all three status values, preserved complete Product representation, allowed transition sequences, admin authorization, bearer authentication, missing products, unknown status validation, invalid transitions, and reactivation with an inactive category.
 - T035 is complete. Updated Product names are canonicalized at schema validation, and Product monetary response fields are serialized explicitly with two decimal places while remaining `Decimal` values internally.
+- T038 is complete. Added typed `ProductRepository.update_product_status()` with one-transaction commit/refresh behavior and SQLAlchemy rollback with exception re-raising.
+- T039 is complete. Added `ProductService.change_product_status()`, which performs typed lookup, delegates transition validation and active-category reactivation checks to the Product domain, and persists the resulting status through the repository. The existing domain capability predicates remain explicit and limited to status-dependent stock-entry/sale permissions.
+- Updated the status integration fixture to canonicalize directly persisted product names with `normalize_product_name()`, preserving the same invariant used by production code.
+- T041 is complete. Created `tests/integration/test_product_constraints_postgres.py` with PostgreSQL-backed coverage for foreign-key integrity, canonical-name uniqueness, NUMERIC(10,2) boundaries, non-negative constraints, enum status values, database defaults, duplicate-name transaction races, rollback/preservation, and the distinction between product-level `available_quantity` and stock-specific quantities.
+- The PostgreSQL test fixture uses `DATABASE_URL`, skips when a PostgreSQL URL is unavailable, creates only the Category/Product tables, and cleans up rows using an exclusive T041 prefix without replacing PostgreSQL with SQLite.
 
 Validation:
 
@@ -101,18 +110,35 @@ Validation:
 - `.venv/bin/python -m compileall -q tests/contract/test_product_management.py` completed successfully.
 - `.venv/bin/python -m pytest tests/integration/test_product_status.py -q` returned 3 passed and 12 failed. The 3 capability-predicate tests passed; the 12 status-service tests fail because `ProductService.change_product_status` is not implemented yet, as expected before T039.
 - `.venv/bin/python -m compileall -q tests/integration/test_product_status.py` completed successfully.
+- `.venv/bin/python -m compileall -q repository/inventory/product_repository.py` completed successfully.
+- An isolated repository status-update verification confirmed that success performs exactly one commit and one refresh without rollback, while SQLAlchemy failure performs one rollback and re-raises the original exception.
+- `.venv/bin/python -m pytest tests/integration/test_product_status.py -q` initially returned 10 passed and 5 failed because the direct fixture persisted `Status Product` while expectations required `STATUS PRODUCT`.
+- After canonicalizing the fixture with `normalize_product_name()`, the same command returned 15 passed and 1 existing Pydantic deprecation warning.
+- `.venv/bin/python -m compileall -q services/inventory/product_service.py domain/inventory/product.py` completed successfully.
+- `.venv/bin/python -m compileall -q tests/integration/test_product_status.py services/inventory/product_service.py` completed successfully.
+- `.venv/bin/python -m compileall -q tests/integration/test_product_constraints_postgres.py` completed successfully.
+- `.venv/bin/python -m pytest tests/integration/test_product_constraints_postgres.py -q -m postgres` returned 9 passed and 1 existing Pydantic deprecation warning.
+- PostgreSQL `NUMERIC(10,2)` accepts a value with excessive scale by normalizing it; therefore T041 validates the declared precision boundary and overflow rejection, while excessive-scale rejection remains covered by the application schema rather than being falsely attributed to a database constraint.
+- `.venv/bin/python -m compileall -q domain/inventory/product.py models/inventory_models/product_model.py repository/inventory/product_repository.py services/inventory/product_service.py schemas/product_schema.py api/routes/inventory_routes/product_routes.py` completed successfully for T042.
+- The T042 AST annotation audit returned no functions or methods with missing parameter or return annotations.
 
 ## Next Task
 
-T038 — Implement typed repository status lookup/update with one-transaction commit and rollback in `repository/inventory/product_repository.py`. Do not begin T038 until explicitly approved.
+T043 — Run the migration and selected contract/integration validation from `specs/inventory-specs/product-spec/quickstart.md`, including `.venv/bin/python -m pytest tests/ -m "contract or integration"`. Do not begin T043 until explicitly approved.
 
 ## Required Files
 
 - `.specify/memory/constitution.md`
 - `specs/inventory-specs/product-spec/product-progress.md`
-- `specs/inventory-spec/product-spec/tasks.md`
+- `specs/inventory-specs/product-spec/tasks.md`
 - `domain/inventory/product.py`
 - `models/inventory_models/product_model.py`
 - `repository/inventory/product_repository.py`
 - `services/inventory/product_service.py`
-- `tests/integration/test_product_status.py`
+- `schemas/product_schema.py`
+- `api/routes/inventory_routes/product_routes.py`
+- `specs/inventory-specs/product-spec/quickstart.md`
+- `alembic.ini`
+- `alembic/env.py`
+- `tests/conftest.py`
+- `pytest.ini`

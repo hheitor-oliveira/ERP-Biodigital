@@ -87,7 +87,7 @@ description: "Actionable implementation tasks for Product Management"
 - [x] T021 [US2] Implement typed repository queries for list, identifier, canonical name, category, status, and combined filters with category loading in `repository/inventory/product_repository.py`
 - [x] T022 [US2] Implement Product-to-response/domain mapping without N+1 category lookups in `services/inventory/product_service.py`
 - [x] T023 [US2] Implement authenticated `GET /product` and `GET /product/{product_id}` handlers with optional filters and stable empty/not-found behavior in `api/routes/inventory_routes/product_routes.py`
-- [ ] T024 [US2] Align response attribute serialization for identifiers, nested category, Decimal prices, quantity, and all status values in `schemas/product_schema.py`
+- [x] T024 [US2] Align response attribute serialization for identifiers, nested category, Decimal prices, quantity, and all status values in `schemas/product_schema.py`
 
 **Checkpoint**: Authenticated catalog visibility is independently functional, including all required filters and status distinctions.
 
@@ -101,14 +101,14 @@ description: "Actionable implementation tasks for Product Management"
 
 ### Tests for User Story 5
 
-- [ ] T025 [P] [US5] Add contract tests for deletion absence/rejection and stable atomic-update error responses in `tests/contract/test_product_management.py`
-- [ ] T026 [P] [US5] Add integration tests for deletion protection, identifier preservation, failed-update rollback, and nonexistent-update no-create behavior in `tests/integration/test_product_update.py`
+- [x] T025 [P] [US5] Add contract tests for deletion absence/rejection and stable atomic-update error responses in `tests/contract/test_product_management.py`
+- [x] T026 [P] [US5] Add integration tests for deletion protection, identifier preservation, failed-update rollback, and nonexistent-update no-create behavior in `tests/integration/test_product_update.py`
 
 ### Implementation for User Story 5
 
-- [ ] T027 [US5] Reject product deletion explicitly and preserve rows/identifiers in `repository/inventory/product_repository.py` and `services/inventory/product_service.py`
-- [ ] T028 [US5] Implement full prospective-state validation and one-commit rollback semantics shared by product mutations in `services/inventory/product_service.py` and `repository/inventory/product_repository.py`
-- [ ] T029 [US5] Ensure generic or legacy product deletion paths are absent or mapped to the stable deletion-rejected response in `api/routes/inventory_routes/product_routes.py`
+- [x] T027 [US5] Reject product deletion explicitly and preserve rows/identifiers in `repository/inventory/product_repository.py` and `services/inventory/product_service.py`
+- [x] T028 [US5] Implement full prospective-state validation and one-commit rollback semantics shared by product mutations in `services/inventory/product_service.py` and `repository/inventory/product_repository.py`
+- [x] T029 [US5] Ensure generic or legacy product deletion paths are absent or mapped to the stable deletion-rejected response in `api/routes/inventory_routes/product_routes.py`
 
 **Checkpoint**: Product lifecycle preservation and atomicity guarantees are independently verified.
 
@@ -122,14 +122,14 @@ description: "Actionable implementation tasks for Product Management"
 
 ### Tests for User Story 3
 
-- [ ] T030 [P] [US3] Add contract tests for `PATCH /product/{product_id}` partial payloads, admin authorization, updated representation, and error status categories in `tests/contract/test_product_management.py`
-- [ ] T031 [P] [US3] Add integration tests for single/multi-field updates, omitted fields, non-admin denial, invalid prices, excessive precision, duplicate names, invalid categories, and atomic rollback in `tests/integration/test_product_update.py`
+- [x] T030 [P] [US3] Add contract tests for `PATCH /product/{product_id}` partial payloads, admin authorization, updated representation, and error status categories in `tests/contract/test_product_management.py`
+- [x] T031 [P] [US3] Add integration tests for single/multi-field updates, omitted fields, non-admin denial, invalid prices, excessive precision, duplicate names, invalid categories, and atomic rollback in `tests/integration/test_product_update.py`
 
 ### Implementation for User Story 3
 
 - [x] T032 [US3] Implement typed repository lookup and atomic partial-update persistence for Product records in `repository/inventory/product_repository.py`
-- [ ] T033 [US3] Implement admin-only product-data update service logic with complete prospective-state validation and active-category checks in `services/inventory/product_service.py`
-- [ ] T034 [US3] Implement `PATCH /product/{product_id}` with optional update fields, at-least-one-field validation, bearer/admin authorization, and stable errors in `api/routes/inventory_routes/product_routes.py`
+- [x] T033 [US3] Implement admin-only product-data update service logic with complete prospective-state validation and active-category checks in `services/inventory/product_service.py`
+- [x] T034 [US3] Implement `PATCH /product/{product_id}` with optional update fields, at-least-one-field validation, bearer/admin authorization, and stable errors in `api/routes/inventory_routes/product_routes.py`
 - [x] T035 [US3] Enforce canonicalization and Decimal serialization for updated Product values in `schemas/product_schema.py` and `domain/inventory/product.py`
 
 **Checkpoint**: Admin product-data maintenance is independently functional and cannot partially persist invalid changes.
@@ -144,14 +144,14 @@ description: "Actionable implementation tasks for Product Management"
 
 ### Tests for User Story 4
 
-- [ ] T036 [P] [US4] Add contract tests for `PATCH /product/{product_id}/status`, all status values, authorization, preserved representation, and error categories in `tests/contract/test_product_management.py`
+- [x] T036 [P] [US4] Add contract tests for `PATCH /product/{product_id}/status`, all status values, authorization, preserved representation, and error categories in `tests/contract/test_product_management.py`
 - [ ] T037 [P] [US4] Add integration tests for allowed transitions, reactivation category rules, invalid statuses/transitions, missing products, record preservation, and explicit stock-entry/sale capability predicates for ACTIVE, INACTIVE, and DISCONTINUED in `tests/integration/test_product_status.py`
 
 ### Implementation for User Story 4
 
-- [ ] T038 [US4] Implement typed repository status lookup/update with one-transaction commit and rollback in `repository/inventory/product_repository.py`
-- [ ] T039 [US4] Implement admin-only status transition validation, active-category reactivation checks, and stock/sale capability predicates in `services/inventory/product_service.py` and `domain/inventory/product.py`
-- [ ] T040 [US4] Implement `PATCH /product/{product_id}/status` with enum validation, authentication/admin enforcement, stable errors, and preserved Product response in `api/routes/inventory_routes/product_routes.py`
+- [x] T038 [US4] Implement typed repository status lookup/update with one-transaction commit and rollback in `repository/inventory/product_repository.py`
+- [x] T039 [US4] Implement admin-only status transition validation, active-category reactivation checks, and stock/sale capability predicates in `services/inventory/product_service.py` and `domain/inventory/product.py`
+- [x] T040 [US4] Implement `PATCH /product/{product_id}/status` with enum validation, authentication/admin enforcement, stable errors, and preserved Product response in `api/routes/inventory_routes/product_routes.py`
 
 **Checkpoint**: Admin lifecycle status management is independently functional, preserves records, and does not implement out-of-scope stock or sale workflows.
 

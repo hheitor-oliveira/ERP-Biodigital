@@ -8,6 +8,7 @@ from schemas.product_schema import (
   CreateProductSchema,
   ProductQueryFilterSchema,
   ProductResponseSchema,
+  ProductStatusUpdateSchema,
   UpdateProductSchema,
 )
 from services.inventory.category_service import CategoryService
@@ -125,6 +126,34 @@ async def get_product(
     raise product_domain_error_to_http(error)
 
   return product
+
+
+@inventory_router.patch(
+  '/{product_id}/status',
+  response_model=ProductResponseSchema,
+)
+async def update_product_status(
+    product_id: int,
+    status_update: ProductStatusUpdateSchema,
+    session: Session = Depends(get_session),
+    admin_user: UserModel = Depends(get_admin_user),
+) -> ProductResponseSchema:
+  try:
+    product_model = ProductService.change_product_status(
+      product_id,
+      status_update.status,
+      session,
+    )
+    return product_model_to_response(product_model, session)
+  except (
+    ProductValidationError,
+    InvalidProductCategoryError,
+    ProductNotFoundError,
+    DuplicateProductNameError,
+    InvalidProductStatusTransitionError,
+    ProductDeletionRejectedError,
+  ) as exc:
+    raise product_domain_error_to_http(exc) from exc
 
 
 @inventory_router.patch(

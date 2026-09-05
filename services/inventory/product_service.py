@@ -149,6 +149,31 @@ class ProductService:
             ) from exc
 
     @classmethod
+    def change_product_status(
+        cls,
+        product_id: int,
+        new_status: StatusEnum,
+        session: Session,
+    ) -> ProductModel:
+        product_row = ProductRepository.find_product_by_id(
+            product_id,
+            session,
+        )
+
+        if product_row is None:
+            raise ProductNotFoundError("Product not found.")
+
+        product_model, category_model = product_row
+        product = cls._to_domain_product(product_model, category_model)
+        product.change_status(new_status)
+
+        return ProductRepository.update_product_status(
+            product_model,
+            product.status,
+            session,
+        )
+
+    @classmethod
     def list_products(
         cls,
         session: Session,

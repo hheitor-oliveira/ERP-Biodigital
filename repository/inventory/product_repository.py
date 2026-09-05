@@ -75,6 +75,24 @@ class ProductRepository:
         return product_model
 
     @classmethod
+    def update_product_status(
+        cls,
+        product_model: ProductModel,
+        new_status: StatusEnum,
+        session: Session,
+    ) -> ProductModel:
+        product_model.product_status = new_status
+
+        try:
+            session.commit()
+            session.refresh(product_model)
+        except SQLAlchemyError:
+            session.rollback()
+            raise
+
+        return product_model
+
+    @classmethod
     def list_products(
         cls,
         session: Session,
