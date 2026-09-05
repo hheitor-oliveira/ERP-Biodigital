@@ -37,63 +37,49 @@
 - Product-domain exception-to-HTTP mapping is explicit in `api/routes/inventory_routes/product_routes.py` for validation, category, not-found, duplicate-name, transition, and deletion errors.
 - Completed T013 by creating `tests/contract/test_product_management.py` with contract coverage for authenticated product creation, canonical representation, authentication requirements, empty listing, invalid creation data, category errors, and duplicate canonical names.
 - Completed T014 by creating `tests/integration/test_product_create.py` with integration coverage for valid creation, canonical persistence, missing and inactive categories, missing required fields, negative prices, excessive Decimal scale, and duplicate canonical names.
+- Completed T015 by implementing typed Product persistence construction in `repository/inventory/product_repository.py`.
+- Product persistence now explicitly stores the canonical name, category identifier, prices, available quantity, and status.
+- Product creation now returns the persisted `ProductModel` after commit and refresh.
+- SQLAlchemy persistence failures now roll back the session and re-raise the original exception, preserving single-transaction behavior.
 
 ## Where It Stopped
 
-T014 is complete. Product integration tests now cover the planned creation endpoint and persistence/error behavior for the full T014 scenario set.
+T015 is complete. Execution stopped after implementing and validating Product repository construction and transactional create/rollback behavior.
 
-No unrelated task was started. Execution stopped before T015.
+No unrelated task was started. T016 was not started.
 
 Validation:
 
-- The new migration passed Python syntax validation with `.venv/bin/python -m py_compile`.
-- Alembic revision-chain validation passed; `c1d2e3f4a5b6` is the current head and revises `bba7ec3010b3`.
-- `.venv/bin/alembic upgrade head` completed successfully using `PostgresqlImpl`.
-- PostgreSQL upgrade read-back validation passed for revision `c1d2e3f4a5b6`, constraint `product_product_name_key`, and zero non-canonical product names.
-- PostgreSQL downgrade read-back validation passed after removing `product_product_name_key`; the migration was then reapplied and the upgrade read-back passed again.
-- Category contract tests passed: 8 passed.
-- Direct validation of active, inactive, and missing category handling passed.
-- Python syntax validation passed for `services/inventory/category_service.py` and `services/inventory/product_service.py`.
-- Selected Category integration suite produced 11 passes and 7 existing authentication-gate failures (`401 Unauthorized`); those failures occurred before the modified service logic was reached.
-- Python syntax validation passed for `schemas/product_schema.py`.
-- Direct schema validation passed for valid creation data, blank names, negative/excess-scale/overflow monetary values, enum parsing, optional query filters, empty updates, partial updates, and explicit null update rejection.
-- Contract test collection passed: 6 tests collected from `tests/contract/test_product_management.py`.
-- Contract test execution currently reports 6 expected failures with `404 Not Found` because the planned `/product` endpoints are not implemented yet; no production code was changed during T013.
-- The contract test run also reported one existing Pydantic deprecation warning in `schemas/user_schema.py`.
-- Python syntax validation passed for `tests/integration/test_product_create.py` with `.venv/bin/python -m py_compile`.
-- Integration test collection passed with 12 tests collected from `tests/integration/test_product_create.py`.
-- T014 integration execution reported 11 failures and 1 pass because the planned `POST /product` endpoint is not implemented yet and returns `404 Not Found`; the one passing test verified no product was persisted after a missing-category request.
-- The T014 integration run also reported the existing Pydantic deprecation warning in `schemas/user_schema.py`.
+- `.venv/bin/python -m py_compile repository/inventory/product_repository.py` passed.
+- Product integration test collection passed: 12 tests collected from `tests/integration/test_product_create.py`.
+- An isolated SQLAlchemy transaction smoke test passed: the first Product creation committed, a duplicate creation raised the database integrity error, rollback executed, and the session remained usable with exactly one persisted product.
+- The collection run reported the existing Pydantic deprecation warning in `schemas/user_schema.py`.
+- Full T014 endpoint execution remains blocked by the previously recorded missing `/product` implementation; T016–T018 are required before those tests can pass.
 
 ## Next Task
 
-T015 — Implementar a construção tipada e a persistência transacional de Product com comportamento de commit/rollback em `repository/inventory/product_repository.py`.
+T016 — Implementar a validação de criação autenticada, categoria ativa, nome canônico, preços, quantidade inicial e erros de integridade duplicada em `services/inventory/product_service.py`.
 
 ## Required Files
 
 - `.specify/memory/constitution.md`
 - `specs/inventory-specs/product-spec/product-progress.md`
 - `specs/inventory-specs/product-spec/tasks.md`
+- `specs/inventory-specs/product-spec/plan.md`
+- `specs/inventory-specs/product-spec/research.md`
+- `specs/inventory-specs/product-spec/data-model.md`
+- `specs/inventory-specs/product-spec/contracts/product-api.md`
 - `models/inventory_models/product_model.py`
 - `models/inventory_models/category_model.py`
 - `domain/enums/status.py`
-- `alembic/env.py`
-- `alembic/versions/`
-- `specs/inventory-specs/product-spec/data-model.md`
-- `specs/inventory-specs/product-spec/plan.md`
-- `specs/inventory-specs/product-spec/research.md`
-- `services/inventory/category_service.py`
 - `domain/inventory/category.py`
-- `services/inventory/product_service.py`
 - `domain/inventory/product.py`
-- `schemas/product_schema.py`
-- `specs/inventory-specs/product-spec/spec.md`
-- `specs/inventory-specs/product-spec/contracts/product-api.md`
-- `api/dependencies.py`
-- `api/routes/inventory_routes/product_routes.py`
-- `api/routes/auth_routes.py`
 - `domain/exceptions/__init__.py`
+- `repository/inventory/category_repository.py`
+- `repository/inventory/product_repository.py`
+- `services/inventory/category_service.py`
+- `services/inventory/product_service.py`
+- `schemas/product_schema.py`
 - `tests/conftest.py`
 - `tests/contract/test_product_management.py`
 - `tests/integration/test_product_create.py`
-- `repository/inventory/product_repository.py`
