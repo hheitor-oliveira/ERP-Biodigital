@@ -1,9 +1,9 @@
 from domain.inventory.product import Product
-from domain.inventory.category import Category
 from decimal import Decimal
 from repository.inventory.category_repository import CategoryRepository
 from sqlalchemy.orm import Session
 from repository.inventory.product_repository import ProductRepository
+from services.inventory.category_service import CategoryService
 
 class ProductService():
   
@@ -18,12 +18,7 @@ class ProductService():
     
     category_model = CategoryRepository.find_category_by_id(category_id, session)
     
-    if category_model is None:
-      raise UnboundLocalError('Categoria não existe.')
-    else:
-      category = Category(category_model.category_name,
-                          category_model.category_id,
-                          category_model.category_status)
+    category = CategoryService.require_active_category(category_model)
     
     product = Product(name,
                     category,
@@ -46,10 +41,8 @@ class ProductService():
           
       if category_model is None:
         raise UnboundLocalError('Categoria não encontrada.')
-      else:
-        category = Category(category_model.category_name,
-                            category_model.category_id,
-                            category_model.category_status)
+
+      category = CategoryService.to_domain_category(category_model)
       
       product = Product(
         product_model.product_name,

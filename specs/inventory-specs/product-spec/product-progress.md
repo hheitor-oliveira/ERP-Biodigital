@@ -25,12 +25,15 @@
 - Completed T009 by creating `alembic/versions/c1d2e3f4a5b6_product_management.py`.
 - The T009 migration canonicalizes existing PostgreSQL product names by trimming, collapsing whitespace, and uppercasing before adding the database unique constraint `product_product_name_key`.
 - The migration includes a downgrade path that removes the canonical product-name uniqueness constraint.
+- Completed T010 by centralizing active-category validation and CategoryModel-to-Category conversion in `services/inventory/category_service.py`.
+- Product creation now requires an existing active category through the shared CategoryService boundary.
+- Product listing now reuses the shared CategoryService domain conversion while preserving the existing missing-category error behavior.
 
 ## Where It Stopped
 
-T009 is complete. The Product mapping and Alembic migration now express the persistence invariants required by the Product specification, including canonical product-name persistence and database uniqueness.
+T010 is complete. Category conversion and active-category validation are centralized at the Category service boundary, and ProductService reuses that behavior for creation and listing.
 
-No unrelated task was started. Execution stopped before T010.
+No unrelated task was started. Execution stopped before T011.
 
 Validation:
 
@@ -39,10 +42,14 @@ Validation:
 - `.venv/bin/alembic upgrade head` completed successfully using `PostgresqlImpl`.
 - PostgreSQL upgrade read-back validation passed for revision `c1d2e3f4a5b6`, constraint `product_product_name_key`, and zero non-canonical product names.
 - PostgreSQL downgrade read-back validation passed after removing `product_product_name_key`; the migration was then reapplied and the upgrade read-back passed again.
+- Category contract tests passed: 8 passed.
+- Direct validation of active, inactive, and missing category handling passed.
+- Python syntax validation passed for `services/inventory/category_service.py` and `services/inventory/product_service.py`.
+- The selected Category integration suite produced 11 passes and 7 existing authentication-gate failures (`401 Unauthorized`); those failures occurred before the modified service logic was reached.
 
 ## Next Task
 
-T010 — Refatorar a conversão compartilhada de Category para domínio e a validação de categoria ativa em `services/inventory/category_service.py`, preservando o comportamento existente de Category.
+T011 — Definir os schemas tipados de resposta, criação, filtros, atualização e alteração de status do Product em `schemas/product_schema.py`, com validação de Decimal e enum.
 
 ## Required Files
 
@@ -59,3 +66,8 @@ T010 — Refatorar a conversão compartilhada de Category para domínio e a vali
 - `specs/inventory-specs/product-spec/research.md`
 - `services/inventory/category_service.py`
 - `domain/inventory/category.py`
+- `services/inventory/product_service.py`
+- `domain/inventory/product.py`
+- `schemas/product_schema.py`
+- `specs/inventory-specs/product-spec/spec.md`
+- `specs/inventory-specs/product-spec/contracts/product-api.md`

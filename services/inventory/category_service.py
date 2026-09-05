@@ -3,6 +3,7 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from domain.enums.status import StatusEnum
+from domain.exceptions import InvalidProductCategoryError
 from domain.inventory.category import Category
 from models.inventory_models.category_model import CategoryModel
 from repository.inventory.category_repository import CategoryRepository
@@ -66,6 +67,22 @@ class CategoryService:
             id=category_model.category_id,
             status=category_model.category_status,
         )
+
+    @staticmethod
+    def require_active_category(
+        category_model: CategoryModel | None,
+    ) -> Category:
+        if category_model is None:
+            raise InvalidProductCategoryError("Category not found.")
+
+        category = CategoryService.to_domain_category(category_model)
+
+        if category.status != StatusEnum.ACTIVE:
+            raise InvalidProductCategoryError(
+                "Product requires an active category."
+            )
+
+        return category
 
     @staticmethod
     def to_domain_category_list(category_models: list[CategoryModel]) -> list[Category]:

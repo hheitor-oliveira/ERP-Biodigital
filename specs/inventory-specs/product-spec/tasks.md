@@ -41,7 +41,7 @@ description: "Actionable implementation tasks for Product Management"
 - [x] T007 Update the Product aggregate's typed restore, field-change, status-transition, and capability methods in `domain/inventory/product.py` without implementing stock movement or sale execution
 - [x] T008 Update the SQLAlchemy product mapping and constraints in `models/inventory_models/product_model.py` for canonical-name uniqueness, required fields, non-negative prices and quantity, explicit defaults, foreign key integrity, and valid statuses
 - [x] T009 Create the Alembic migration in `alembic/versions/<new_product_management_revision>.py` for the Product schema constraints and canonical-name persistence, including upgrade and downgrade paths
-- [ ] T010 Refactor shared category-to-domain conversion and active-category validation at the existing Category boundary in `services/inventory/category_service.py`, preserving existing Category behavior
+- [x] T010 Refactor shared category-to-domain conversion and active-category validation at the existing Category boundary in `services/inventory/category_service.py`, preserving existing Category behavior
 - [ ] T011 Define typed Product response, create, query-filter, update, and status request schemas in `schemas/product_schema.py` with Decimal precision and enum validation
 - [ ] T012 Centralize authenticated-user and admin dependency usage in `api/dependencies.py`; keep product-domain error-to-HTTP mapping explicit in `api/routes/inventory_routes/product_routes.py`
 
