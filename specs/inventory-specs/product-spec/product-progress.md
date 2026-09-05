@@ -43,24 +43,28 @@
 - SQLAlchemy persistence failures now roll back the session and re-raise the original exception, preserving single-transaction behavior.
 - Completed T016 by implementing authenticated product-creation service validation through the active-category boundary and Product domain invariants.
 - Product creation now explicitly initializes `available_quantity` to zero and `status` to `StatusEnum.ACTIVE`, returns the persisted `ProductModel`, and translates product-create integrity failures into `DuplicateProductNameError`.
+- Completed T017 by implementing `POST /product` with bearer authentication inherited from the router, `201 Created`, `CreateProductSchema` request validation, and explicit product-domain error mapping.
+- Product request validation intentionally preserves FastAPI's `422` responses, per the approved scope decision; the contract's `400` validation mapping is not applied.
+- Missing categories map to `404`, inactive categories map to `400`, duplicate canonical names map to `409`, and authentication failures map to `401`.
+- The route uses `response_model=None` temporarily because Product response serialization is assigned to T018.
 
 ## Where It Stopped
 
-T016 is complete. Execution stopped after implementing Product creation service validation and duplicate-integrity translation.
+T017 is complete. Execution stopped after implementing the authenticated `POST /product` route and its domain-error mapping.
 
-No unrelated task was started. T017 was not started.
+No unrelated implementation task was started. T018 and T023 were not started.
 
 Validation:
 
-- `.venv/bin/python -m py_compile services/inventory/product_service.py` passed.
-- `.venv/bin/python -m pytest tests/integration/test_product_create.py -q` collected and executed 12 tests: 1 passed and 11 failed because `/product` is not yet implemented and returned `404` for the endpoint scenarios.
-- The failed endpoint execution is an existing dependency on T017/T018, not a service syntax failure.
-- The run reported the existing Pydantic deprecation warning in `schemas/user_schema.py`.
-- Repository-level transaction smoke validation from T015 remains passed.
+- `.venv/bin/python -m py_compile api/routes/inventory_routes/product_routes.py` passed.
+- The focused category test passed: missing category returned `404` and inactive category returned `400`.
+- The focused authentication test confirmed `POST /product` returns `401` without valid authentication; its `GET /product` assertion remains failing with `405` because the GET route belongs to T023 and is not implemented.
+- The broader contract/integration run collected 18 tests: 3 passed and 15 failed. The failures are attributable to T018 response serialization, T023 missing `GET /product`, and existing tests that still expect invalid request payloads to return `400` instead of the approved `422` behavior.
+- The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
 
 ## Next Task
 
-T017 — Implementar `POST /product` em `api/routes/inventory_routes/product_routes.py` com autenticação bearer, resposta `201` e mapeamento estável de erros `400`, `404`, `409` e `401`.
+T018 — Retornar a representação completa de Product com categoria, preços Decimal, status e quantidade disponível através de `schemas/product_schema.py` e `api/routes/inventory_routes/product_routes.py`.
 
 ## Required Files
 
@@ -68,12 +72,14 @@ T017 — Implementar `POST /product` em `api/routes/inventory_routes/product_rou
 - `specs/inventory-specs/product-spec/product-progress.md`
 - `specs/inventory-specs/product-spec/tasks.md`
 - `specs/inventory-specs/product-spec/contracts/product-api.md`
-- `api/dependencies.py`
 - `api/routes/inventory_routes/product_routes.py`
-- `domain/exceptions/__init__.py`
-- `services/inventory/product_service.py`
 - `schemas/product_schema.py`
-- `models/user_model/user_model.py`
-- `tests/conftest.py`
+- `models/inventory_models/product_model.py`
+- `models/inventory_models/category_model.py`
+- `domain/inventory/category.py`
+- `domain/inventory/product.py`
+- `services/inventory/product_service.py`
+- `repository/inventory/category_repository.py`
+- `services/inventory/category_service.py`
 - `tests/contract/test_product_management.py`
 - `tests/integration/test_product_create.py`
