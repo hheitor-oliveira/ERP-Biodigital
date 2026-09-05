@@ -48,3 +48,20 @@ def verify_access_token(token: str = Depends(oauth2_schema), session: Session  =
     if not usuario:
         raise HTTPException(status_code=401, detail='Acesso negado')
     return usuario
+
+
+def get_authenticated_user(
+    user_model: UserModel = Depends(verify_access_token),
+) -> UserModel:
+    return user_model
+
+
+def get_admin_user(
+    user_model: UserModel = Depends(get_authenticated_user),
+) -> UserModel:
+    if not user_model.admin:
+        raise HTTPException(
+            status_code=401,
+            detail='Acesso negado, você não tem permissão para realizar está operação',
+        )
+    return user_model

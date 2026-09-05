@@ -32,12 +32,15 @@
 - Product schemas now validate finite, non-negative Decimal monetary values within `99999999.99` and with at most two decimal places.
 - Product schemas now validate non-blank names with the existing 100-character model limit, use `StatusEnum`, support optional query filters, and represent partial updates.
 - Explicit null values are rejected for update fields, and `UpdateProductSchema.has_updates()` identifies empty update payloads for application-layer rejection.
+- Completed T012 by centralizing authenticated-user and admin dependencies in `api/dependencies.py`.
+- Product routes now require the reusable authenticated-user dependency at the router boundary.
+- Product-domain exception-to-HTTP mapping is explicit in `api/routes/inventory_routes/product_routes.py` for validation, category, not-found, duplicate-name, transition, and deletion errors.
 
 ## Where It Stopped
 
-T011 is complete. Typed Product request and response schemas are defined with monetary, name, enum, filter, and partial-update validation.
+T012 is complete. Authentication and administrator dependencies are centralized, and the Product API boundary has explicit domain-error mapping.
 
-No unrelated task was started. Execution stopped before T012.
+No unrelated task was started. Execution stopped before T013.
 
 Validation:
 
