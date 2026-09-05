@@ -1,4 +1,4 @@
-from domain.inventory.product import Product
+from domain.inventory.product import Product, normalize_product_name
 from domain.enums.status import StatusEnum
 from models.inventory_models.category_model import CategoryModel
 from models.inventory_models.product_model import ProductModel
@@ -76,7 +76,9 @@ class ProductRepository:
             query = query.where(ProductModel.product_id == product_id)
 
         if product_name is not None:
-            query = query.where(ProductModel.product_name == product_name)
+            query = query.where(
+                ProductModel.product_name == normalize_product_name(product_name)
+            )
 
         if category_id is not None:
             query = query.where(ProductModel.category_id == category_id)

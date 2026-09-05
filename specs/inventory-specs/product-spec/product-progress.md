@@ -61,30 +61,32 @@
 - Product list and detail mappings now consume the repository's joined `(ProductModel, CategoryModel)` tuples without N+1 category lookups.
 - Product list mapping now supports optional name, category, and status filters and returns typed `ProductResponseSchema` values.
 - Product detail mapping now returns a typed response or `None` for an unknown identifier.
+- Continued T023 by canonicalizing repository name filters with `normalize_product_name()`.
+- Continued T023 by routing product creation responses through `ProductResponseSchema.from_model()` and `CategoryService.to_domain_category()`, aligning create and query category representation.
 
 ## Where It Stopped
 
-T023 is partially implemented. The authenticated `GET /product` and `GET /product/{product_id}` handlers were added with optional filters, stable empty-list behavior, and `404` mapping for unknown identifiers.
+T023 remains partially implemented. The authenticated `GET /product` and `GET /product/{product_id}` handlers are present with optional filters, stable empty-list behavior, and `404` mapping for unknown identifiers. The approved repository and response-representation changes were applied and validated, but the task is stopped because existing tests still encode two conflicting expectations that require separate approval.
 
-Execution stopped after validation exposed defects outside the approved route-handler change:
+Current blockers:
 
-- Product name filtering remains literal in `ProductRepository._query_products_with_categories()` and does not canonicalize the query value.
-- Query response category names are canonicalized through `CategoryService.to_domain_category()`, while the creation response still exposes the persisted model value, causing representation mismatch in existing tests.
+- Two contract assertions still expect the raw persisted category name (`Categoria Válida`) instead of the canonical response name (`CATEGORIA VÁLIDA`). The implementation now consistently uses the canonical domain representation.
 - One existing create-validation assertion still expects `400` while the approved T017 behavior intentionally returns FastAPI `422`.
 
-No unrelated implementation task was started. The repository/service/schema defects were not changed because they belong to T021/T022/T024 scope and require separate approval.
+No test files or additional implementation tasks were changed. T024/T017 scope was not started.
 
 Validation:
 
-- `api/routes/inventory_routes/product_routes.py` passed the automatic syntax/lint check after editing.
-- `.venv/bin/python -m pytest tests/contract/test_product_management.py tests/integration/test_product_query.py -q` returned 14 passed and 7 failed.
-- Passing coverage includes authentication requirements, empty results, category/status filters, combined filters, unknown identifiers, and the implemented route behavior.
-- Failed coverage is limited to the name-filter defect, category representation mismatch, and the previously documented `400` versus `422` create-validation expectation.
+- `repository/inventory/product_repository.py` and `api/routes/inventory_routes/product_routes.py` passed the automatic syntax/lint check after editing.
+- `.venv/bin/python -m pytest tests/contract/test_product_management.py tests/integration/test_product_query.py -q` returned 18 passed and 3 failed.
+- The canonical name-filter coverage now passes.
+- Authentication, empty results, category/status filters, combined filters, unknown identifiers, and the implemented route behavior pass.
+- The three failures are limited to the two stale category-representation assertions and the previously documented `400` versus `422` create-validation expectation.
 - The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
 
 ## Next Task
 
-T023 continuation — Resolve the identified query name canonicalization and response-representation dependencies, then rerun the T023 contract/integration validation. Required approval is needed before modifying T021/T022/T024-owned code.
+T023 continuation — Obtain approval to update the affected contract expectations for canonical category serialization and the approved FastAPI `422` validation behavior, then rerun the T023 contract/integration validation. Do not begin T024 until this validation passes.
 
 ## Required Files
 

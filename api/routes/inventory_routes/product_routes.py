@@ -8,6 +8,7 @@ from schemas.product_schema import (
   ProductQueryFilterSchema,
   ProductResponseSchema,
 )
+from services.inventory.category_service import CategoryService
 from services.inventory.product_service import ProductService
 from api.dependencies import get_authenticated_user, get_session
 from domain.exceptions import (
@@ -56,18 +57,9 @@ def product_model_to_response(
   if category_model is None:
     raise ProductNotFoundError('Product category not found.')
 
-  return ProductResponseSchema(
-    id=product_model.product_id,
-    name=product_model.product_name,
-    category={
-      'id': category_model.category_id, # type: ignore
-      'name': category_model.category_name, # type: ignore
-      'status': category_model.category_status, # type: ignore
-    },
-    cost_price=product_model.cost_price,
-    sale_value=product_model.sale_value,
-    status=product_model.product_status,
-    available_quantity=product_model.available_quantity,
+  return ProductResponseSchema.from_model(
+    product_model=product_model,
+    category=CategoryService.to_domain_category(category_model),
   )
 
 
