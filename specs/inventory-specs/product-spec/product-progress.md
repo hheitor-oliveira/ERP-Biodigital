@@ -28,12 +28,16 @@
 - Completed T010 by centralizing active-category validation and CategoryModel-to-Category conversion in `services/inventory/category_service.py`.
 - Product creation now requires an existing active category through the shared CategoryService boundary.
 - Product listing now reuses the shared CategoryService domain conversion while preserving the existing missing-category error behavior.
+- Completed T011 by defining typed Product response, creation, query-filter, update, and status request schemas in `schemas/product_schema.py`.
+- Product schemas now validate finite, non-negative Decimal monetary values within `99999999.99` and with at most two decimal places.
+- Product schemas now validate non-blank names with the existing 100-character model limit, use `StatusEnum`, support optional query filters, and represent partial updates.
+- Explicit null values are rejected for update fields, and `UpdateProductSchema.has_updates()` identifies empty update payloads for application-layer rejection.
 
 ## Where It Stopped
 
-T010 is complete. Category conversion and active-category validation are centralized at the Category service boundary, and ProductService reuses that behavior for creation and listing.
+T011 is complete. Typed Product request and response schemas are defined with monetary, name, enum, filter, and partial-update validation.
 
-No unrelated task was started. Execution stopped before T011.
+No unrelated task was started. Execution stopped before T012.
 
 Validation:
 
@@ -45,11 +49,13 @@ Validation:
 - Category contract tests passed: 8 passed.
 - Direct validation of active, inactive, and missing category handling passed.
 - Python syntax validation passed for `services/inventory/category_service.py` and `services/inventory/product_service.py`.
-- The selected Category integration suite produced 11 passes and 7 existing authentication-gate failures (`401 Unauthorized`); those failures occurred before the modified service logic was reached.
+- Selected Category integration suite produced 11 passes and 7 existing authentication-gate failures (`401 Unauthorized`); those failures occurred before the modified service logic was reached.
+- Python syntax validation passed for `schemas/product_schema.py`.
+- Direct schema validation passed for valid creation data, blank names, negative/excess-scale/overflow monetary values, enum parsing, optional query filters, empty updates, partial updates, and explicit null update rejection.
 
 ## Next Task
 
-T011 — Definir os schemas tipados de resposta, criação, filtros, atualização e alteração de status do Product em `schemas/product_schema.py`, com validação de Decimal e enum.
+T012 — Centralizar as dependências de autenticação de usuário autenticado e administrador em `api/dependencies.py`, mantendo o mapeamento explícito de erros de domínio em `api/routes/inventory_routes/product_routes.py`.
 
 ## Required Files
 
@@ -71,3 +77,7 @@ T011 — Definir os schemas tipados de resposta, criação, filtros, atualizaç�
 - `schemas/product_schema.py`
 - `specs/inventory-specs/product-spec/spec.md`
 - `specs/inventory-specs/product-spec/contracts/product-api.md`
+- `api/dependencies.py`
+- `api/routes/inventory_routes/product_routes.py`
+- `api/routes/auth_routes.py`
+- `domain/exceptions/__init__.py`
