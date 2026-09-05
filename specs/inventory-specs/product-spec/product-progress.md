@@ -50,12 +50,14 @@
 - Completed T018 by returning the complete Product representation from `POST /product` with the product identifier, canonical product name, persisted category representation, Decimal prices, status, and available quantity.
 - Product response serialization now uses `ProductResponseSchema` explicitly instead of relying on mismatched SQLAlchemy attribute names.
 - Product creation responses now declare `response_model=ProductResponseSchema` and preserve the persisted category name while exposing the canonical product name.
+- Completed T019 by adding contract coverage for authenticated product listing and detail queries in `tests/contract/test_product_management.py`.
+- The T019 contract coverage verifies complete list/detail representations, canonical case-insensitive name filtering, combined category/status filtering, empty filtered results, unknown identifiers, and authentication requirements for both GET endpoints.
 
 ## Where It Stopped
 
-T018 is complete. Execution stopped after implementing and validating the complete Product response for the authenticated `POST /product` route.
+T019 is complete. Execution stopped after adding and validating the Product query contract tests.
 
-No unrelated implementation task was started. T019 and later tasks were not started.
+No unrelated implementation task was started. T020 and later tasks were not started.
 
 Validation:
 
@@ -67,10 +69,12 @@ Validation:
 - The focused authentication test confirmed `POST /product` returns `401` without valid authentication; its `GET /product` assertion remains failing with `405` because the GET route belongs to T023 and is not implemented.
 - The broader contract/integration run collected 18 tests: 3 passed and 15 failed. The failures are attributable to T018 response serialization, T023 missing `GET /product`, and existing tests that still expect invalid request payloads to return `400` instead of the approved `422` behavior.
 - The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
+- T019 focused validation collected 7 selected tests: 1 passed and 6 failed. The failures are expected until T023 implements the query routes: `GET /product` currently returns `405`, and `GET /product/{product_id}` currently returns `404`.
+- The T019 test file passed syntax/lint validation during the edit.
 
 ## Next Task
 
-T019 — Adicionar testes de contrato para `GET /product` e `GET /product/{product_id}`, incluindo representações, filtros, array vazio, autenticação e respostas de não encontrado.
+T020 — Adicionar testes de integração para listagem/detalhe, busca por nome sem distinção de maiúsculas, filtros de categoria/status, filtros combinados, catálogo vazio e identificadores desconhecidos.
 
 ## Required Files
 
@@ -91,3 +95,4 @@ T019 — Adicionar testes de contrato para `GET /product` e `GET /product/{produ
 - `tests/integration/test_product_create.py`
 - `repository/inventory/product_repository.py`
 - `tests/conftest.py`
+- `tests/integration/test_product_query.py`
