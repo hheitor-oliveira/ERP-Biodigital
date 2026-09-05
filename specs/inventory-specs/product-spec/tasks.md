@@ -127,7 +127,7 @@ description: "Actionable implementation tasks for Product Management"
 
 ### Implementation for User Story 3
 
-- [ ] T032 [US3] Implement typed repository lookup and atomic partial-update persistence for Product records in `repository/inventory/product_repository.py`
+- [x] T032 [US3] Implement typed repository lookup and atomic partial-update persistence for Product records in `repository/inventory/product_repository.py`
 - [ ] T033 [US3] Implement admin-only product-data update service logic with complete prospective-state validation and active-category checks in `services/inventory/product_service.py`
 - [ ] T034 [US3] Implement `PATCH /product/{product_id}` with optional update fields, at-least-one-field validation, bearer/admin authorization, and stable errors in `api/routes/inventory_routes/product_routes.py`
 - [ ] T035 [US3] Enforce canonicalization and Decimal serialization for updated Product values in `schemas/product_schema.py` and `domain/inventory/product.py`

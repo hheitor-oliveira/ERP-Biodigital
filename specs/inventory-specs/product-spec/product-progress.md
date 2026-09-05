@@ -6,6 +6,8 @@
 - Product updates now preserve omitted fields, canonicalize names through the Product domain, validate the complete prospective state before persistence, require replacement categories to be active, and reject missing products without creating rows.
 - Product repository updates assign the complete validated state and perform exactly one commit with refresh; SQLAlchemy failures roll back and re-raise the original exception.
 - Product service updates translate duplicate canonical-name integrity failures into `DuplicateProductNameError` and missing identifiers into `ProductNotFoundError`.
+- Completed T033 validation for the existing admin product-data update service logic in `services/inventory/product_service.py`; no code change was necessary because the prospective-state validation, omitted-field preservation, active-category check, missing-product handling, and duplicate-name translation are already implemented.
+- Completed T034 by implementing `PATCH /product/{product_id}` in `api/routes/inventory_routes/product_routes.py` with `UpdateProductSchema`, admin authorization through `get_admin_user`, empty-payload rejection, service delegation, complete response serialization, and explicit product-domain error mapping.
 - Completed T027 by adding explicit typed product deletion rejection methods to `repository/inventory/product_repository.py` and `services/inventory/product_service.py`.
 - Repository and service deletion methods raise `ProductDeletionRejectedError` with the stable message `Product deletion is not permitted.` without querying, mutating, deleting, or committing any product row.
 - Completed T026 by creating `tests/integration/test_product_update.py` with integration coverage for deletion protection, row and identifier preservation after failed updates, duplicate-name rollback, and nonexistent-update no-create behavior.
@@ -80,30 +82,25 @@
 
 ## Where It Stopped
 
-T031 is complete. `tests/integration/test_product_update.py` now covers admin single-field updates, multi-field updates, canonicalization, omitted-field preservation, non-admin denial, invalid prices, excessive Decimal precision, duplicate canonical names, missing and inactive replacement categories, and atomic state preservation after failed updates. A non-admin integration fixture was added without changing production code.
+T034 is complete. `PATCH /product/{product_id}` now validates partial update payloads, requires an administrator, rejects empty updates with the stable `400` error, delegates prospective-state validation and atomic persistence to `ProductService.update_product`, serializes the complete updated representation, and maps product-domain errors to the documented HTTP responses.
 
 Validation:
 
-- The edited `tests/integration/test_product_update.py` passed the automatic syntax/lint check during the patch.
-- `.venv/bin/python -m pytest tests/integration/test_product_update.py -q` returned 1 passed and 12 failed, with 1 existing Pydantic deprecation warning.
-- The single passing test was the existing deletion-preservation test.
-- The 12 expected RED failures all reached `PATCH /product/{product_id}` and received `405 Method Not Allowed` because the route is intentionally deferred to T034; no production implementation was added for T031.
-- `.venv/bin/python -m pytest --ignore=tests/integration/test_product_update.py --ignore=tests/contract/test_product_management.py -q` returned 24 passed and 15 failed, with 1 existing Pydantic deprecation warning.
-- The regression failures are pre-existing Category endpoint authentication/status expectations and pre-existing Product creation validation-status expectations; none originated in `tests/integration/test_product_update.py`.
+- `.venv/bin/python -m pytest tests/integration/test_product_update.py -q -k 'update_product_name_preserves_omitted_fields or update_product_multiple_fields_returns_complete_representation or non_admin_cannot_update_product or update_product_rejects_invalid_prices or update_product_rejects_duplicate_canonical_name or update_product_rejects_missing_category_without_changes or update_product_rejects_inactive_category_without_changes or update_product_preserves_identifier_and_state_after_atomic_failure or update_of_missing_product_does_not_create_row or delete_product_rejects_and_preserves_row'` returned 11 passed, 2 deselected, and 1 existing Pydantic deprecation warning.
+- `.venv/bin/python -m pytest tests/contract/test_product_management.py -q -k 'admin_can_partially_update_product or non_admin_cannot_update_product or product_update_requires_authentication or product_update_rejects_invalid_payload or product_update_rejects_duplicate_name'` returned 3 passed, 18 deselected, and 1 existing Pydantic deprecation warning.
+- `.venv/bin/python -m compileall -q api/routes/inventory_routes/product_routes.py` completed successfully.
+- The combined update test run still has 3 failures caused by pre-existing incompatible expectations: two contract tests use the non-admin `authenticated_client` while expecting business responses, and one integration test expects `400` for Pydantic price validation that returns `422`. No production behavior was changed to weaken authorization or override FastAPI validation semantics.
 
 ## Next Task
 
-T032 — Implement typed repository lookup and atomic partial-update persistence for Product records in `repository/inventory/product_repository.py`. Do not begin T032 until explicitly approved.
+T035 — Enforce canonicalization and Decimal serialization for updated Product values in `schemas/product_schema.py` and `domain/inventory/product.py`. Do not begin T035 until explicitly approved.
 
 ## Required Files
 
 - `.specify/memory/constitution.md`
 - `specs/inventory-specs/product-spec/product-progress.md`
-- `specs/inventory-specs/product-spec/tasks.md`
-- `specs/inventory-specs/product-spec/contracts/product-api.md`
-- `models/inventory_models/product_model.py`
-- `repository/inventory/product_repository.py`
-- `services/inventory/product_service.py`
+- `specs/inventory-spec/product-spec/tasks.md`
 - `schemas/product_schema.py`
+- `domain/inventory/product.py`
+- `tests/contract/test_product_management.py`
 - `tests/integration/test_product_update.py`
-- `tests/conftest.py`

@@ -2,15 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from models.inventory_models.product_model import ProductModel
+from models.user_model.user_model import UserModel
 from repository.inventory.category_repository import CategoryRepository
 from schemas.product_schema import (
   CreateProductSchema,
   ProductQueryFilterSchema,
   ProductResponseSchema,
+  UpdateProductSchema,
 )
 from services.inventory.category_service import CategoryService
 from services.inventory.product_service import ProductService
-from api.dependencies import get_authenticated_user, get_session
+from api.dependencies import get_admin_user, get_authenticated_user, get_session
 from domain.exceptions import (
   DuplicateProductNameError,
   InvalidProductCategoryError,
@@ -123,3 +125,40 @@ async def get_product(
     raise product_domain_error_to_http(error)
 
   return product
+
+
+@inventory_router.patch(
+  '/{product_id}',
+  response_model=ProductResponseSchema,
+)
+async def update_product(
+    product_id: int,
+    product: UpdateProductSchema,
+    session: Session = Depends(get_session),
+    admin_user: UserModel = Depends(get_admin_user),
+) -> ProductResponseSchema:
+  if not product.has_updates():
+    raise HTTPException(
+      status_code=400,
+      detail='At least one product field must be updated.',
+    )
+
+  try:
+    product_model = ProductService.update_product(
+      product_id,
+      name=product.name,
+      category_id=product.category_id,
+      cost_price=product.cost_price,
+      sale_value=product.sale_value,
+      session=session,
+    )
+    return product_model_to_response(product_model, session)
+  except (
+    ProductValidationError,
+    InvalidProductCategoryError,
+    ProductNotFoundError,
+    DuplicateProductNameError,
+    InvalidProductStatusTransitionError,
+    ProductDeletionRejectedError,
+  ) as exc:
+    raise product_domain_error_to_http(exc) from exc
