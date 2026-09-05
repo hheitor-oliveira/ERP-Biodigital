@@ -54,50 +54,42 @@
 - The T019 contract coverage verifies complete list/detail representations, canonical case-insensitive name filtering, combined category/status filtering, empty filtered results, unknown identifiers, and authentication requirements for both GET endpoints.
 - Completed T020 by creating `tests/integration/test_product_query.py` with integration coverage for empty catalogs, list/detail representations, canonical case-insensitive name filtering, category/status filters, combined filters, no-match results, and unknown identifiers.
 - T020 query fixtures create products through the authenticated API where applicable and insert non-ACTIVE products through `ProductModel` to cover status filtering before status routes exist.
+- Completed T021 by implementing typed ProductRepository queries in `repository/inventory/product_repository.py` for listing, identifier lookup, canonical-name lookup, category filtering, status filtering, and combined filters.
+- Product queries now use an explicit join with `CategoryModel` and return typed `(ProductModel, CategoryModel)` tuples so category data is loaded in the same query.
+- Product listing queries are ordered by `ProductModel.product_id` and support optional name, category, and status filters.
 
 ## Where It Stopped
 
-T020 is complete. Execution stopped after adding and validating the Product query integration tests.
+T021 is complete. Execution stopped after implementing and validating the typed ProductRepository query methods.
 
-No unrelated implementation task was started. T021 and later tasks were not started.
+No unrelated implementation task was started. T022 and later tasks were not started.
 
 Validation:
 
-- `.venv/bin/python -m py_compile api/routes/inventory_routes/product_routes.py` passed.
-- `.venv/bin/python -m py_compile schemas/product_schema.py api/routes/inventory_routes/product_routes.py` passed for T018.
-- `.venv/bin/python -m pytest tests/contract/test_product_management.py -k "create_product_returns_canonical_representation"` passed: 1 selected test passed.
-- `.venv/bin/python -m pytest tests/integration/test_product_create.py -k "persists_valid_canonical_product"` passed: 1 selected test passed.
-- The focused category test passed: missing category returned `404` and inactive category returned `400`.
-- The focused authentication test confirmed `POST /product` returns `401` without valid authentication; its `GET /product` assertion remains failing with `405` because the GET route belongs to T023 and is not implemented.
-- The broader contract/integration run collected 18 tests: 3 passed and 15 failed. The failures are attributable to T018 response serialization, T023 missing `GET /product`, and existing tests that still expect invalid request payloads to return `400` instead of the approved `422` behavior.
-- The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
-- T019 focused validation collected 7 selected tests: 1 passed and 6 failed. The failures are expected until T023 implements the query routes: `GET /product` currently returns `405`, and `GET /product/{product_id}` currently returns `404`.
-- The T019 test file passed syntax/lint validation during the edit.
-- `.venv/bin/python -m py_compile tests/integration/test_product_query.py` passed.
-- `.venv/bin/python -m pytest tests/integration/test_product_query.py -q` collected 9 tests: 1 passed and 8 failed. The passing test verified `GET /product/{product_id}` returns `404` for an unknown identifier; the remaining failures are expected because T021-T023 have not implemented the required query routes and currently return `405` for `GET /product` or `404` for an existing product detail request.
+- `.venv/bin/python -m py_compile repository/inventory/product_repository.py` passed.
+- A real SQLite repository validation passed for status filtering, canonical-name lookup, category filtering, combined-query infrastructure, and joined category loading.
+- The existing API integration query tests were not used as the T021 acceptance gate because their route/service behavior belongs to T022 and T023; those tasks have not been started.
 - The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
 
 ## Next Task
 
-T021 — Implementar consultas tipadas no repositório para listagem, identificador, nome canônico, categoria, status e filtros combinados, com carregamento da categoria.
+T022 — Implementar o mapeamento Product-to-response/domain sem consultas N+1 de categoria em `services/inventory/product_service.py`.
 
 ## Required Files
 
 - `.specify/memory/constitution.md`
 - `specs/inventory-specs/product-spec/product-progress.md`
-- `specs/inventory-specs/product-spec/tasks.md`
+- `specs/inventory-spec/product-spec/tasks.md`
 - `specs/inventory-specs/product-spec/contracts/product-api.md`
-- `api/routes/inventory_routes/product_routes.py`
+- `repository/inventory/product_repository.py`
+- `services/inventory/product_service.py`
 - `schemas/product_schema.py`
 - `models/inventory_models/product_model.py`
 - `models/inventory_models/category_model.py`
 - `domain/inventory/category.py`
 - `domain/inventory/product.py`
-- `services/inventory/product_service.py`
-- `repository/inventory/category_repository.py`
 - `services/inventory/category_service.py`
+- `api/routes/inventory_routes/product_routes.py`
 - `tests/contract/test_product_management.py`
-- `tests/integration/test_product_create.py`
 - `tests/integration/test_product_query.py`
-- `repository/inventory/product_repository.py`
 - `tests/conftest.py`
