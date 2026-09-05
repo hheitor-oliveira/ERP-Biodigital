@@ -36,12 +36,13 @@
 - Product routes now require the reusable authenticated-user dependency at the router boundary.
 - Product-domain exception-to-HTTP mapping is explicit in `api/routes/inventory_routes/product_routes.py` for validation, category, not-found, duplicate-name, transition, and deletion errors.
 - Completed T013 by creating `tests/contract/test_product_management.py` with contract coverage for authenticated product creation, canonical representation, authentication requirements, empty listing, invalid creation data, category errors, and duplicate canonical names.
+- Completed T014 by creating `tests/integration/test_product_create.py` with integration coverage for valid creation, canonical persistence, missing and inactive categories, missing required fields, negative prices, excessive Decimal scale, and duplicate canonical names.
 
 ## Where It Stopped
 
-T013 is complete. Product contract tests exist for the planned creation and listing endpoints, authentication boundary, canonical response data, and documented creation error categories.
+T014 is complete. Product integration tests now cover the planned creation endpoint and persistence/error behavior for the full T014 scenario set.
 
-No unrelated task was started. Execution stopped before T014.
+No unrelated task was started. Execution stopped before T015.
 
 Validation:
 
@@ -59,10 +60,14 @@ Validation:
 - Contract test collection passed: 6 tests collected from `tests/contract/test_product_management.py`.
 - Contract test execution currently reports 6 expected failures with `404 Not Found` because the planned `/product` endpoints are not implemented yet; no production code was changed during T013.
 - The contract test run also reported one existing Pydantic deprecation warning in `schemas/user_schema.py`.
+- Python syntax validation passed for `tests/integration/test_product_create.py` with `.venv/bin/python -m py_compile`.
+- Integration test collection passed with 12 tests collected from `tests/integration/test_product_create.py`.
+- T014 integration execution reported 11 failures and 1 pass because the planned `POST /product` endpoint is not implemented yet and returns `404 Not Found`; the one passing test verified no product was persisted after a missing-category request.
+- The T014 integration run also reported the existing Pydantic deprecation warning in `schemas/user_schema.py`.
 
 ## Next Task
 
-T014 — Adicionar testes de integração para criação válida, categoria inexistente/inativa, campos obrigatórios inválidos, preços inválidos, precisão Decimal excessiva e nomes canônicos duplicados em `tests/integration/test_product_create.py`.
+T015 — Implementar a construção tipada e a persistência transacional de Product com comportamento de commit/rollback em `repository/inventory/product_repository.py`.
 
 ## Required Files
 
@@ -90,4 +95,5 @@ T014 — Adicionar testes de integração para criação válida, categoria inex
 - `domain/exceptions/__init__.py`
 - `tests/conftest.py`
 - `tests/contract/test_product_management.py`
-- `tests/integration/`
+- `tests/integration/test_product_create.py`
+- `repository/inventory/product_repository.py`
