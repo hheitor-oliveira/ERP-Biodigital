@@ -333,3 +333,64 @@ def test_create_product_rejects_duplicate_canonical_name(
 
     assert first_response.status_code == 201
     assert duplicate_response.status_code == 409
+
+
+def test_product_deletion_endpoint_is_not_exposed(
+    authenticated_client,
+    category_factory,
+):
+    category = category_factory()
+    create_response = authenticated_client.post(
+        "/product",
+        json={
+            "name": "Preserved Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product_id = create_response.json()["id"]
+
+    response = authenticated_client.delete(f"/product/{product_id}")
+
+    assert response.status_code == 405
+    assert "detail" in response.json()
+
+
+def test_product_update_returns_stable_not_found_error(
+    authenticated_client,
+):
+    response = authenticated_client.patch(
+        "/product/999999",
+        json={"name": "Updated Product"},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Product not found."}
+
+
+def test_product_update_rejects_empty_payload_with_stable_error(
+    authenticated_client,
+    category_factory,
+):
+    category = category_factory()
+    create_response = authenticated_client.post(
+        "/product",
+        json={
+            "name": "Atomic Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product_id = create_response.json()["id"]
+
+    response = authenticated_client.patch(
+        f"/product/{product_id}",
+        json={},
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "At least one product field must be updated."
+    }

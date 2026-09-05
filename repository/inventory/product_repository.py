@@ -1,5 +1,6 @@
 from domain.inventory.product import Product, normalize_product_name
 from domain.enums.status import StatusEnum
+from domain.exceptions import ProductDeletionRejectedError
 from models.inventory_models.category_model import CategoryModel
 from models.inventory_models.product_model import ProductModel
 from sqlalchemy import select
@@ -12,6 +13,16 @@ ProductWithCategory = tuple[ProductModel, CategoryModel]
 
 
 class ProductRepository:
+    @classmethod
+    def delete_product(
+        cls,
+        product_id: int,
+        session: Session,
+    ) -> None:
+        raise ProductDeletionRejectedError(
+            "Product deletion is not permitted."
+        )
+
     @classmethod
     def create_product(
         cls,
@@ -29,6 +40,32 @@ class ProductRepository:
 
         try:
             session.add(product_model)
+            session.commit()
+            session.refresh(product_model)
+        except SQLAlchemyError:
+            session.rollback()
+            raise
+
+        return product_model
+
+    @classmethod
+    def update_product(
+        cls,
+        product_model: ProductModel,
+        product: Product,
+        session: Session,
+    ) -> ProductModel:
+        if product.category.id is None:
+            raise ValueError("Persisted category must have an identifier.")
+
+        product_model.product_name = product.name
+        product_model.category_id = product.category.id
+        product_model.cost_price = product.cost_price
+        product_model.sale_value = product.sale_value
+        product_model.available_quantity = product.available_quantity
+        product_model.product_status = product.status
+
+        try:
             session.commit()
             session.refresh(product_model)
         except SQLAlchemyError:

@@ -4,7 +4,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from domain.enums.status import StatusEnum
-from domain.exceptions import DuplicateProductNameError
+from domain.exceptions import (
+    DuplicateProductNameError,
+    ProductNotFoundError,
+)
 from domain.inventory.product import Product
 from models.inventory_models.category_model import CategoryModel
 from models.inventory_models.product_model import ProductModel
@@ -15,6 +18,14 @@ from services.inventory.category_service import CategoryService
 
 
 class ProductService:
+    @classmethod
+    def delete_product(
+        cls,
+        product_id: int,
+        session: Session,
+    ) -> None:
+        ProductRepository.delete_product(product_id, session)
+
     @staticmethod
     def _to_domain_product(
         product_model: ProductModel,
@@ -74,6 +85,64 @@ class ProductService:
 
         try:
             return ProductRepository.create_product(product, session)
+        except IntegrityError as exc:
+            raise DuplicateProductNameError(
+                "A product with this canonical name already exists."
+            ) from exc
+
+    @classmethod
+    def update_product(
+        cls,
+        product_id: int,
+        *,
+        name: str | None = None,
+        category_id: int | None = None,
+        cost_price: Decimal | None = None,
+        sale_value: Decimal | None = None,
+        session: Session,
+    ) -> ProductModel:
+        product_row = ProductRepository.find_product_by_id(product_id, session)
+
+        if product_row is None:
+            raise ProductNotFoundError("Product not found.")
+
+        product_model, category_model = product_row
+
+        if category_id is None:
+            category = CategoryService.to_domain_category(category_model)
+        else:
+            replacement_category_model = CategoryRepository.find_category_by_id(
+                category_id,
+                session,
+            )
+            category = CategoryService.require_active_category(
+                replacement_category_model,
+            )
+
+        prospective_product = Product(
+            id=product_id,
+            name=product_model.product_name if name is None else name,
+            category=category,
+            cost_price=(
+                product_model.cost_price
+                if cost_price is None
+                else cost_price
+            ),
+            sale_value=(
+                product_model.sale_value
+                if sale_value is None
+                else sale_value
+            ),
+            available_quantity=product_model.available_quantity,
+            status=product_model.product_status,
+        )
+
+        try:
+            return ProductRepository.update_product(
+                product_model,
+                prospective_product,
+                session,
+            )
         except IntegrityError as exc:
             raise DuplicateProductNameError(
                 "A product with this canonical name already exists."

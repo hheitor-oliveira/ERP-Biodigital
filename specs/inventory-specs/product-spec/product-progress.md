@@ -2,6 +2,16 @@
 
 ## What Was Done
 
+- Completed T028 by implementing prospective-state product updates across `repository/inventory/product_repository.py` and `services/inventory/product_service.py`.
+- Product updates now preserve omitted fields, canonicalize names through the Product domain, validate the complete prospective state before persistence, require replacement categories to be active, and reject missing products without creating rows.
+- Product repository updates assign the complete validated state and perform exactly one commit with refresh; SQLAlchemy failures roll back and re-raise the original exception.
+- Product service updates translate duplicate canonical-name integrity failures into `DuplicateProductNameError` and missing identifiers into `ProductNotFoundError`.
+- Completed T027 by adding explicit typed product deletion rejection methods to `repository/inventory/product_repository.py` and `services/inventory/product_service.py`.
+- Repository and service deletion methods raise `ProductDeletionRejectedError` with the stable message `Product deletion is not permitted.` without querying, mutating, deleting, or committing any product row.
+- Completed T026 by creating `tests/integration/test_product_update.py` with integration coverage for deletion protection, row and identifier preservation after failed updates, duplicate-name rollback, and nonexistent-update no-create behavior.
+- Completed T025 by adding contract coverage in `tests/contract/test_product_management.py` for the absence of a product deletion endpoint and the stable PATCH update error contract.
+- The deletion contract verifies that `DELETE /product/{product_id}` is not exposed and returns `405`.
+- The update contracts define `404` with `Product not found.` for an unknown product and `400` with `At least one product field must be updated.` for an empty update payload.
 - Completed T003 by creating `docs/code/inventory/product-management.md`.
 - Completed T004 by adding the typed product-domain exception hierarchy in `domain/exceptions/__init__.py`.
 - Completed T005 by adding canonical product-name normalization and blank-name validation in `domain/inventory/product.py`.
@@ -70,20 +80,27 @@
 
 ## Where It Stopped
 
-T024 is complete. Product and nested category response schemas now align persistence attribute names with the public response representation while preserving canonical names, Decimal prices, quantity, and all StatusEnum values.
-
-No blockers remain for T024. T025 scope was not started.
+T028 is complete. Product repository and service updates now validate prospective state and use one-commit rollback semantics. HTTP update and deletion route behavior remain assigned to later route tasks.
 
 Validation:
 
-- `schemas/product_schema.py` passed the automatic syntax/lint check after editing.
-- `.venv/bin/python -m pytest tests/contract/test_product_management.py tests/integration/test_product_query.py -q` returned 21 passed and 1 existing Pydantic deprecation warning.
-- Response serialization, authentication, empty results, complete representations, canonical name filtering, category/status filters, combined filters, invalid payload behavior, unknown identifiers, and the implemented route behavior pass.
+- `.venv/bin/python -m compileall -q repository/inventory/product_repository.py services/inventory/product_service.py` passed.
+- Direct repository verification passed for complete-state assignment, exactly one commit/refresh, and rollback with re-raised `SQLAlchemyError`.
+- Direct service verification passed for canonical partial update, omitted-field preservation, duplicate-name rejection with row/identifier preservation, and missing-product rejection without creation.
+- The edited contract test module passed the automatic syntax/lint check.
+- `.venv/bin/python -m pytest tests/contract/test_product_management.py -q` returned 13 passed and 2 failed, with 1 existing Pydantic deprecation warning.
+- The deletion test passed with `405 Method Not Allowed`.
+- The unknown-product and empty-payload update tests returned `405 Method Not Allowed` because `PATCH /product/{product_id}` is not implemented yet; they currently expect the approved future contract statuses `404` and `400`.
+- The new `tests/integration/test_product_update.py` module passed the automatic syntax/lint check.
+- `.venv/bin/python -m pytest tests/integration/test_product_update.py -q` returned 1 passed and 3 failed, with 1 existing Pydantic deprecation warning.
+- The deletion-preservation test passed with `405 Method Not Allowed` and confirmed the product remained queryable and persisted.
+- The failed-update, duplicate-name-update, and missing-product-update tests returned `405 Method Not Allowed` because `PATCH /product/{product_id}` is not implemented yet; they currently expect the approved future contract statuses `400`, `409`, and `404`.
+- The direct repository/service verification passed for both deletion methods, confirming `ProductDeletionRejectedError` and the stable rejection message without a database session.
 - The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
 
 ## Next Task
 
-T025 — Add contract tests for deletion absence/rejection and stable atomic-update error responses in `tests/contract/test_product_management.py`. Do not begin T025 until explicitly approved.
+T029 — Ensure generic or legacy product deletion paths are absent or mapped to the stable deletion-rejected response in `api/routes/inventory_routes/product_routes.py`. Do not begin T029 until explicitly approved.
 
 ## Required Files
 
@@ -91,16 +108,10 @@ T025 — Add contract tests for deletion absence/rejection and stable atomic-upd
 - `specs/inventory-specs/product-spec/product-progress.md`
 - `specs/inventory-spec/product-spec/tasks.md`
 - `specs/inventory-specs/product-spec/contracts/product-api.md`
+- `domain/exceptions/__init__.py`
+- `api/routes/inventory_routes/product_routes.py`
 - `repository/inventory/product_repository.py`
 - `services/inventory/product_service.py`
-- `schemas/product_schema.py`
-- `models/inventory_models/product_model.py`
-- `models/inventory_models/category_model.py`
-- `domain/inventory/category.py`
-- `domain/inventory/product.py`
-- `services/inventory/category_service.py`
-- `repository/inventory/product_repository.py`
-- `api/routes/inventory_routes/product_routes.py`
 - `tests/contract/test_product_management.py`
 - `tests/integration/test_product_update.py`
 - `tests/conftest.py`
