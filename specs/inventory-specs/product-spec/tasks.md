@@ -86,7 +86,7 @@ description: "Actionable implementation tasks for Product Management"
 
 - [x] T021 [US2] Implement typed repository queries for list, identifier, canonical name, category, status, and combined filters with category loading in `repository/inventory/product_repository.py`
 - [x] T022 [US2] Implement Product-to-response/domain mapping without N+1 category lookups in `services/inventory/product_service.py`
-- [ ] T023 [US2] Implement authenticated `GET /product` and `GET /product/{product_id}` handlers with optional filters and stable empty/not-found behavior in `api/routes/inventory_routes/product_routes.py`
+- [x] T023 [US2] Implement authenticated `GET /product` and `GET /product/{product_id}` handlers with optional filters and stable empty/not-found behavior in `api/routes/inventory_routes/product_routes.py`
 - [ ] T024 [US2] Align response attribute serialization for identifiers, nested category, Decimal prices, quantity, and all status values in `schemas/product_schema.py`
 
 **Checkpoint**: Authenticated catalog visibility is independently functional, including all required filters and status distinctions.

@@ -118,22 +118,28 @@ class ProductStatusUpdateSchema(BaseModel):
 
 
 class CategoryResponseSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+    )
 
-    id: int
-    name: str
-    status: StatusEnum
+    id: int = Field(validation_alias="category_id")
+    name: str = Field(validation_alias="category_name")
+    status: StatusEnum = Field(validation_alias="category_status")
 
 
 class ProductResponseSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+    )
 
-    id: int
-    name: str
+    id: int = Field(validation_alias="product_id")
+    name: str = Field(validation_alias="product_name")
     category: CategoryResponseSchema
     cost_price: Decimal
     sale_value: Decimal
-    status: StatusEnum
+    status: StatusEnum = Field(validation_alias="product_status")
     available_quantity: int
 
     @classmethod

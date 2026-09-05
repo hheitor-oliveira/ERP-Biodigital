@@ -61,32 +61,29 @@
 - Product list and detail mappings now consume the repository's joined `(ProductModel, CategoryModel)` tuples without N+1 category lookups.
 - Product list mapping now supports optional name, category, and status filters and returns typed `ProductResponseSchema` values.
 - Product detail mapping now returns a typed response or `None` for an unknown identifier.
-- Continued T023 by canonicalizing repository name filters with `normalize_product_name()`.
-- Continued T023 by routing product creation responses through `ProductResponseSchema.from_model()` and `CategoryService.to_domain_category()`, aligning create and query category representation.
+- Completed T023 by canonicalizing repository name filters with `normalize_product_name()`.
+- Completed T023 by routing product creation responses through `ProductResponseSchema.from_model()` and `CategoryService.to_domain_category()`, aligning create and query category representation.
+- Updated the affected contract expectations to require canonical category serialization (`CATEGORIA VÁLIDA`) and FastAPI `422` validation for invalid request payloads.
+- Completed T024 by aligning Product and nested Category response schemas with persistence attribute names through validation aliases while preserving public API field names.
+- Product response schemas now accept `product_id`, `product_name`, and `product_status`, while nested category responses accept `category_id`, `category_name`, and `category_status`.
+- Response schemas retain `from_attributes=True`, permit explicit public field names through `populate_by_name=True`, and preserve Decimal and StatusEnum serialization behavior.
 
 ## Where It Stopped
 
-T023 remains partially implemented. The authenticated `GET /product` and `GET /product/{product_id}` handlers are present with optional filters, stable empty-list behavior, and `404` mapping for unknown identifiers. The approved repository and response-representation changes were applied and validated, but the task is stopped because existing tests still encode two conflicting expectations that require separate approval.
+T024 is complete. Product and nested category response schemas now align persistence attribute names with the public response representation while preserving canonical names, Decimal prices, quantity, and all StatusEnum values.
 
-Current blockers:
-
-- Two contract assertions still expect the raw persisted category name (`Categoria Válida`) instead of the canonical response name (`CATEGORIA VÁLIDA`). The implementation now consistently uses the canonical domain representation.
-- One existing create-validation assertion still expects `400` while the approved T017 behavior intentionally returns FastAPI `422`.
-
-No test files or additional implementation tasks were changed. T024/T017 scope was not started.
+No blockers remain for T024. T025 scope was not started.
 
 Validation:
 
-- `repository/inventory/product_repository.py` and `api/routes/inventory_routes/product_routes.py` passed the automatic syntax/lint check after editing.
-- `.venv/bin/python -m pytest tests/contract/test_product_management.py tests/integration/test_product_query.py -q` returned 18 passed and 3 failed.
-- The canonical name-filter coverage now passes.
-- Authentication, empty results, category/status filters, combined filters, unknown identifiers, and the implemented route behavior pass.
-- The three failures are limited to the two stale category-representation assertions and the previously documented `400` versus `422` create-validation expectation.
+- `schemas/product_schema.py` passed the automatic syntax/lint check after editing.
+- `.venv/bin/python -m pytest tests/contract/test_product_management.py tests/integration/test_product_query.py -q` returned 21 passed and 1 existing Pydantic deprecation warning.
+- Response serialization, authentication, empty results, complete representations, canonical name filtering, category/status filters, combined filters, invalid payload behavior, unknown identifiers, and the implemented route behavior pass.
 - The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
 
 ## Next Task
 
-T023 continuation — Obtain approval to update the affected contract expectations for canonical category serialization and the approved FastAPI `422` validation behavior, then rerun the T023 contract/integration validation. Do not begin T024 until this validation passes.
+T025 — Add contract tests for deletion absence/rejection and stable atomic-update error responses in `tests/contract/test_product_management.py`. Do not begin T025 until explicitly approved.
 
 ## Required Files
 
@@ -105,5 +102,5 @@ T023 continuation — Obtain approval to update the affected contract expectatio
 - `repository/inventory/product_repository.py`
 - `api/routes/inventory_routes/product_routes.py`
 - `tests/contract/test_product_management.py`
-- `tests/integration/test_product_query.py`
+- `tests/integration/test_product_update.py`
 - `tests/conftest.py`

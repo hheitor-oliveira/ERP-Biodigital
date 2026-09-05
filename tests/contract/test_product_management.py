@@ -61,7 +61,7 @@ def test_create_product_returns_canonical_representation(
         "name": "EXAMPLE PRODUCT",
         "category": {
             "id": category.category_id,
-            "name": category.category_name,
+            "name": "CATEGORIA VÁLIDA",
             "status": "ACTIVE",
         },
         "cost_price": "10.00",
@@ -127,7 +127,7 @@ def test_list_products_returns_complete_representations(
             "name": "LISTED PRODUCT",
             "category": {
                 "id": category.category_id,
-                "name": category.category_name,
+                "name": "CATEGORIA VÁLIDA",
                 "status": "ACTIVE",
             },
             "cost_price": "10.00",
@@ -281,7 +281,7 @@ def test_create_product_rejects_invalid_payload(
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert "detail" in response.json()
 
 
