@@ -32,6 +32,20 @@ def authenticated_client(client, app, authenticated_user: UserModel):
     app.dependency_overrides.pop(get_authenticated_user, None)
 
 
+@pytest.fixture()
+def admin_client(client, app):
+    admin_user = UserModel(
+        user_id=2,
+        user_name="Contract Admin",
+        user_email="contract-admin@example.com",
+        user_password="hashed-password",
+        admin=True,
+    )
+    app.dependency_overrides[get_authenticated_user] = lambda: admin_user
+    yield client
+    app.dependency_overrides.pop(get_authenticated_user, None)
+
+
 def unauthenticated_request() -> None:
     raise HTTPException(
         status_code=401,
@@ -394,3 +408,182 @@ def test_product_update_rejects_empty_payload_with_stable_error(
     assert response.json() == {
         "detail": "At least one product field must be updated."
     }
+
+
+def test_admin_can_partially_update_product_and_preserve_omitted_fields(
+    admin_client,
+    category_factory,
+):
+    category = category_factory()
+    create_response = admin_client.post(
+        "/product",
+        json={
+            "name": "Original Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product = create_response.json()
+
+    response = admin_client.patch(
+        f"/product/{product['id']}",
+        json={"name": "  Updated   Product  "},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": product["id"],
+        "name": "UPDATED PRODUCT",
+        "category": {
+            "id": category.category_id,
+            "name": "CATEGORIA VÁLIDA",
+            "status": "ACTIVE",
+        },
+        "cost_price": "10.00",
+        "sale_value": "15.00",
+        "status": "ACTIVE",
+        "available_quantity": 0,
+    }
+
+
+def test_admin_can_update_multiple_product_fields(
+    admin_client,
+    category_factory,
+):
+    original_category = category_factory(name="Original Category")
+    replacement_category = category_factory(name="Replacement Category")
+    create_response = admin_client.post(
+        "/product",
+        json={
+            "name": "Original Product",
+            "category_id": original_category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product_id = create_response.json()["id"]
+
+    response = admin_client.patch(
+        f"/product/{product_id}",
+        json={
+            "name": "  Updated   Product  ",
+            "category_id": replacement_category.category_id,
+            "cost_price": "12.50",
+            "sale_value": "20.00",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": product_id,
+        "name": "UPDATED PRODUCT",
+        "category": {
+            "id": replacement_category.category_id,
+            "name": "REPLACEMENT CATEGORY",
+            "status": "ACTIVE",
+        },
+        "cost_price": "12.50",
+        "sale_value": "20.00",
+        "status": "ACTIVE",
+        "available_quantity": 0,
+    }
+
+
+def test_non_admin_cannot_update_product(
+    authenticated_client,
+    category_factory,
+):
+    category = category_factory()
+    create_response = authenticated_client.post(
+        "/product",
+        json={
+            "name": "Protected Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product_id = create_response.json()["id"]
+
+    response = authenticated_client.patch(
+        f"/product/{product_id}",
+        json={"name": "Unauthorized Update"},
+    )
+
+    assert response.status_code == 401
+    assert "detail" in response.json()
+
+
+def test_product_update_requires_bearer_authentication(client, app):
+    app.dependency_overrides[verify_access_token] = unauthenticated_request
+    try:
+        response = client.patch(
+            "/product/1",
+            json={"name": "Unauthorized Update"},
+        )
+    finally:
+        app.dependency_overrides.pop(verify_access_token, None)
+
+    assert response.status_code == 401
+    assert "detail" in response.json()
+
+
+def test_product_update_rejects_invalid_payload(
+    admin_client,
+    category_factory,
+):
+    category = category_factory()
+    create_response = admin_client.post(
+        "/product",
+        json={
+            "name": "Validated Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product_id = create_response.json()["id"]
+
+    response = admin_client.patch(
+        f"/product/{product_id}",
+        json={"cost_price": "-1.00"},
+    )
+
+    assert response.status_code == 422
+    assert "detail" in response.json()
+
+
+def test_product_update_rejects_duplicate_canonical_name(
+    admin_client,
+    category_factory,
+):
+    category = category_factory()
+    first_response = admin_client.post(
+        "/product",
+        json={
+            "name": "First Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    second_response = admin_client.post(
+        "/product",
+        json={
+            "name": "Second Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+
+    response = admin_client.patch(
+        f"/product/{second_response.json()['id']}",
+        json={"name": " first   product "},
+    )
+
+    assert first_response.status_code == 201
+    assert second_response.status_code == 201
+    assert response.status_code == 409
+    assert "detail" in response.json()

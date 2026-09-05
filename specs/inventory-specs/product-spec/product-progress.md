@@ -80,38 +80,30 @@
 
 ## Where It Stopped
 
-T028 is complete. Product repository and service updates now validate prospective state and use one-commit rollback semantics. HTTP update and deletion route behavior remain assigned to later route tasks.
+T031 is complete. `tests/integration/test_product_update.py` now covers admin single-field updates, multi-field updates, canonicalization, omitted-field preservation, non-admin denial, invalid prices, excessive Decimal precision, duplicate canonical names, missing and inactive replacement categories, and atomic state preservation after failed updates. A non-admin integration fixture was added without changing production code.
 
 Validation:
 
-- `.venv/bin/python -m compileall -q repository/inventory/product_repository.py services/inventory/product_service.py` passed.
-- Direct repository verification passed for complete-state assignment, exactly one commit/refresh, and rollback with re-raised `SQLAlchemyError`.
-- Direct service verification passed for canonical partial update, omitted-field preservation, duplicate-name rejection with row/identifier preservation, and missing-product rejection without creation.
-- The edited contract test module passed the automatic syntax/lint check.
-- `.venv/bin/python -m pytest tests/contract/test_product_management.py -q` returned 13 passed and 2 failed, with 1 existing Pydantic deprecation warning.
-- The deletion test passed with `405 Method Not Allowed`.
-- The unknown-product and empty-payload update tests returned `405 Method Not Allowed` because `PATCH /product/{product_id}` is not implemented yet; they currently expect the approved future contract statuses `404` and `400`.
-- The new `tests/integration/test_product_update.py` module passed the automatic syntax/lint check.
-- `.venv/bin/python -m pytest tests/integration/test_product_update.py -q` returned 1 passed and 3 failed, with 1 existing Pydantic deprecation warning.
-- The deletion-preservation test passed with `405 Method Not Allowed` and confirmed the product remained queryable and persisted.
-- The failed-update, duplicate-name-update, and missing-product-update tests returned `405 Method Not Allowed` because `PATCH /product/{product_id}` is not implemented yet; they currently expect the approved future contract statuses `400`, `409`, and `404`.
-- The direct repository/service verification passed for both deletion methods, confirming `ProductDeletionRejectedError` and the stable rejection message without a database session.
-- The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
+- The edited `tests/integration/test_product_update.py` passed the automatic syntax/lint check during the patch.
+- `.venv/bin/python -m pytest tests/integration/test_product_update.py -q` returned 1 passed and 12 failed, with 1 existing Pydantic deprecation warning.
+- The single passing test was the existing deletion-preservation test.
+- The 12 expected RED failures all reached `PATCH /product/{product_id}` and received `405 Method Not Allowed` because the route is intentionally deferred to T034; no production implementation was added for T031.
+- `.venv/bin/python -m pytest --ignore=tests/integration/test_product_update.py --ignore=tests/contract/test_product_management.py -q` returned 24 passed and 15 failed, with 1 existing Pydantic deprecation warning.
+- The regression failures are pre-existing Category endpoint authentication/status expectations and pre-existing Product creation validation-status expectations; none originated in `tests/integration/test_product_update.py`.
 
 ## Next Task
 
-T029 — Ensure generic or legacy product deletion paths are absent or mapped to the stable deletion-rejected response in `api/routes/inventory_routes/product_routes.py`. Do not begin T029 until explicitly approved.
+T032 — Implement typed repository lookup and atomic partial-update persistence for Product records in `repository/inventory/product_repository.py`. Do not begin T032 until explicitly approved.
 
 ## Required Files
 
 - `.specify/memory/constitution.md`
 - `specs/inventory-specs/product-spec/product-progress.md`
-- `specs/inventory-spec/product-spec/tasks.md`
+- `specs/inventory-specs/product-spec/tasks.md`
 - `specs/inventory-specs/product-spec/contracts/product-api.md`
-- `domain/exceptions/__init__.py`
-- `api/routes/inventory_routes/product_routes.py`
+- `models/inventory_models/product_model.py`
 - `repository/inventory/product_repository.py`
 - `services/inventory/product_service.py`
-- `tests/contract/test_product_management.py`
+- `schemas/product_schema.py`
 - `tests/integration/test_product_update.py`
 - `tests/conftest.py`
