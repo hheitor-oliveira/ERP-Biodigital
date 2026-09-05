@@ -52,12 +52,14 @@
 - Product creation responses now declare `response_model=ProductResponseSchema` and preserve the persisted category name while exposing the canonical product name.
 - Completed T019 by adding contract coverage for authenticated product listing and detail queries in `tests/contract/test_product_management.py`.
 - The T019 contract coverage verifies complete list/detail representations, canonical case-insensitive name filtering, combined category/status filtering, empty filtered results, unknown identifiers, and authentication requirements for both GET endpoints.
+- Completed T020 by creating `tests/integration/test_product_query.py` with integration coverage for empty catalogs, list/detail representations, canonical case-insensitive name filtering, category/status filters, combined filters, no-match results, and unknown identifiers.
+- T020 query fixtures create products through the authenticated API where applicable and insert non-ACTIVE products through `ProductModel` to cover status filtering before status routes exist.
 
 ## Where It Stopped
 
-T019 is complete. Execution stopped after adding and validating the Product query contract tests.
+T020 is complete. Execution stopped after adding and validating the Product query integration tests.
 
-No unrelated implementation task was started. T020 and later tasks were not started.
+No unrelated implementation task was started. T021 and later tasks were not started.
 
 Validation:
 
@@ -71,10 +73,13 @@ Validation:
 - The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
 - T019 focused validation collected 7 selected tests: 1 passed and 6 failed. The failures are expected until T023 implements the query routes: `GET /product` currently returns `405`, and `GET /product/{product_id}` currently returns `404`.
 - The T019 test file passed syntax/lint validation during the edit.
+- `.venv/bin/python -m py_compile tests/integration/test_product_query.py` passed.
+- `.venv/bin/python -m pytest tests/integration/test_product_query.py -q` collected 9 tests: 1 passed and 8 failed. The passing test verified `GET /product/{product_id}` returns `404` for an unknown identifier; the remaining failures are expected because T021-T023 have not implemented the required query routes and currently return `405` for `GET /product` or `404` for an existing product detail request.
+- The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
 
 ## Next Task
 
-T020 — Adicionar testes de integração para listagem/detalhe, busca por nome sem distinção de maiúsculas, filtros de categoria/status, filtros combinados, catálogo vazio e identificadores desconhecidos.
+T021 — Implementar consultas tipadas no repositório para listagem, identificador, nome canônico, categoria, status e filtros combinados, com carregamento da categoria.
 
 ## Required Files
 
@@ -93,6 +98,6 @@ T020 — Adicionar testes de integração para listagem/detalhe, busca por nome 
 - `services/inventory/category_service.py`
 - `tests/contract/test_product_management.py`
 - `tests/integration/test_product_create.py`
+- `tests/integration/test_product_query.py`
 - `repository/inventory/product_repository.py`
 - `tests/conftest.py`
-- `tests/integration/test_product_query.py`
