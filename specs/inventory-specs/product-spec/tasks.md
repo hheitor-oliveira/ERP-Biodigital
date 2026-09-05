@@ -63,9 +63,9 @@ description: "Actionable implementation tasks for Product Management"
 ### Implementation for User Story 1
 
 - [x] T015 [US1] Implement typed Product persistence construction and single-transaction create/rollback behavior in `repository/inventory/product_repository.py`
-- [ ] T016 [US1] Implement authenticated create validation for active category, canonical name, prices, initial quantity, and duplicate integrity errors in `services/inventory/product_service.py`
-- [ ] T017 [US1] Implement `POST /product` at `api/routes/inventory_routes/product_routes.py` with bearer authentication, `201` response, and stable `400`, `404`, `409`, and `401` error mapping
-- [ ] T018 [US1] Return the created Product representation with category, Decimal prices, status, and available quantity through `schemas/product_schema.py` and `api/routes/inventory_routes/product_routes.py`
+- [x] T016 [US1] Implement authenticated create validation for active category, canonical name, prices, initial quantity, and duplicate integrity errors in `services/inventory/product_service.py`
+- [x] T017 [US1] Implement `POST /product` at `api/routes/inventory_routes/product_routes.py` with bearer authentication, `201` response, and stable `400`, `404`, `409`, and `401` error mapping
+- [x] T018 [US1] Return the created Product representation with category, Decimal prices, status, and available quantity through `schemas/product_schema.py` and `api/routes/inventory_routes/product_routes.py`
 
 **Checkpoint**: Authenticated product creation is independently functional and safe against invalid categories, invalid money, duplicate names, and partial persistence.
 
@@ -79,13 +79,13 @@ description: "Actionable implementation tasks for Product Management"
 
 ### Tests for User Story 2
 
-- [ ] T019 [P] [US2] Add contract tests for `GET /product` and `GET /product/{product_id}` representations, filters, empty arrays, authentication, and not-found responses in `tests/contract/test_product_management.py`
-- [ ] T020 [P] [US2] Add integration tests for list/detail queries, case-insensitive canonical-name lookup, category/status filters, combined filters, empty catalog, and unknown identifiers in `tests/integration/test_product_query.py`
+- [x] T019 [P] [US2] Add contract tests for `GET /product` and `GET /product/{product_id}` representations, filters, empty arrays, authentication, and not-found responses in `tests/contract/test_product_management.py`
+- [x] T020 [P] [US2] Add integration tests for list/detail queries, case-insensitive canonical-name lookup, category/status filters, combined filters, empty catalog, and unknown identifiers in `tests/integration/test_product_query.py`
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Implement typed repository queries for list, identifier, canonical name, category, status, and combined filters with category loading in `repository/inventory/product_repository.py`
-- [ ] T022 [US2] Implement Product-to-response/domain mapping without N+1 category lookups in `services/inventory/product_service.py`
+- [x] T021 [US2] Implement typed repository queries for list, identifier, canonical name, category, status, and combined filters with category loading in `repository/inventory/product_repository.py`
+- [x] T022 [US2] Implement Product-to-response/domain mapping without N+1 category lookups in `services/inventory/product_service.py`
 - [ ] T023 [US2] Implement authenticated `GET /product` and `GET /product/{product_id}` handlers with optional filters and stable empty/not-found behavior in `api/routes/inventory_routes/product_routes.py`
 - [ ] T024 [US2] Align response attribute serialization for identifiers, nested category, Decimal prices, quantity, and all status values in `schemas/product_schema.py`
 

@@ -57,23 +57,27 @@
 - Completed T021 by implementing typed ProductRepository queries in `repository/inventory/product_repository.py` for listing, identifier lookup, canonical-name lookup, category filtering, status filtering, and combined filters.
 - Product queries now use an explicit join with `CategoryModel` and return typed `(ProductModel, CategoryModel)` tuples so category data is loaded in the same query.
 - Product listing queries are ordered by `ProductModel.product_id` and support optional name, category, and status filters.
+- Completed T022 by implementing Product persistence-to-domain and persistence-to-response mapping in `services/inventory/product_service.py`.
+- Product list and detail mappings now consume the repository's joined `(ProductModel, CategoryModel)` tuples without N+1 category lookups.
+- Product list mapping now supports optional name, category, and status filters and returns typed `ProductResponseSchema` values.
+- Product detail mapping now returns a typed response or `None` for an unknown identifier.
 
 ## Where It Stopped
 
-T021 is complete. Execution stopped after implementing and validating the typed ProductRepository query methods.
+T022 is complete. Execution stopped after implementing and validating the typed Product mapping methods.
 
-No unrelated implementation task was started. T022 and later tasks were not started.
+No unrelated implementation task was started. T023 and later tasks were not started.
 
 Validation:
 
-- `.venv/bin/python -m py_compile repository/inventory/product_repository.py` passed.
-- A real SQLite repository validation passed for status filtering, canonical-name lookup, category filtering, combined-query infrastructure, and joined category loading.
-- The existing API integration query tests were not used as the T021 acceptance gate because their route/service behavior belongs to T022 and T023; those tasks have not been started.
+- `.venv/bin/python -m py_compile services/inventory/product_service.py` passed.
+- Direct ProductService mapping validation passed for joined category loading, list filtering, detail mapping, and unknown identifiers.
+- The existing contract/integration query selection reported 16 failures and 5 passes; the failures are expected because the GET route handlers belong to T023 and are not implemented yet. One existing create-validation assertion also remains at HTTP 422, outside T022.
 - The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
 
 ## Next Task
 
-T022 — Implementar o mapeamento Product-to-response/domain sem consultas N+1 de categoria em `services/inventory/product_service.py`.
+T023 — Implementar os handlers autenticados `GET /product` e `GET /product/{product_id}` com filtros opcionais, resposta vazia estável e resposta 404 para identificadores inexistentes.
 
 ## Required Files
 

@@ -6,13 +6,48 @@ from sqlalchemy.orm import Session
 from domain.enums.status import StatusEnum
 from domain.exceptions import DuplicateProductNameError
 from domain.inventory.product import Product
+from models.inventory_models.category_model import CategoryModel
 from models.inventory_models.product_model import ProductModel
 from repository.inventory.category_repository import CategoryRepository
-from repository.inventory.product_repository import ProductRepository
+from repository.inventory.product_repository import ProductRepository, ProductWithCategory
+from schemas.product_schema import ProductResponseSchema
 from services.inventory.category_service import CategoryService
 
 
 class ProductService:
+    @staticmethod
+    def _to_domain_product(
+        product_model: ProductModel,
+        category_model: CategoryModel,
+    ) -> Product:
+        category = CategoryService.to_domain_category(category_model)
+
+        if product_model.product_id is None:
+            raise ValueError("Persisted product must have an identifier.")
+
+        return Product.restore(
+            id=product_model.product_id,
+            name=product_model.product_name,
+            category=category,
+            available_quantity=product_model.available_quantity,
+            sale_value=product_model.sale_value,
+            cost_price=product_model.cost_price,
+            status=product_model.product_status,
+        )
+
+    @classmethod
+    def _to_response(
+        cls,
+        product_with_category: ProductWithCategory,
+    ) -> ProductResponseSchema:
+        product_model, category_model = product_with_category
+        product = cls._to_domain_product(product_model, category_model)
+
+        return ProductResponseSchema.from_model(
+            product_model=product_model,
+            category=product.category,
+        )
+
     @classmethod
     def create_product(
         cls,
@@ -45,34 +80,34 @@ class ProductService:
             ) from exc
 
     @classmethod
-    def list_products(cls,
-                      session: Session):
+    def list_products(
+        cls,
+        session: Session,
+        *,
+        name: str | None = None,
+        category_id: int | None = None,
+        status: StatusEnum | None = None,
+    ) -> list[ProductResponseSchema]:
+        product_rows = ProductRepository.list_products(
+            session,
+            name=name,
+            category_id=category_id,
+            status=status,
+        )
+        return [cls._to_response(row) for row in product_rows]
 
-        product_list: list[Product] = []
-        product_model_list = ProductRepository.list_products(session)
+    @classmethod
+    def find_product_by_id(
+        cls,
+        product_id: int,
+        session: Session,
+    ) -> ProductResponseSchema | None:
+        product_row = ProductRepository.find_product_by_id(
+            product_id,
+            session,
+        )
 
-        for product_model in product_model_list:
+        if product_row is None:
+            return None
 
-            category_model = CategoryRepository.find_category_by_id(product_model.category_id, session)
-
-            if category_model is None:
-                raise UnboundLocalError('Categoria não encontrada.')
-
-            category = CategoryService.to_domain_category(category_model)
-
-            product = Product(
-                product_model.product_name,
-                category,
-                product_model.cost_price,
-                product_model.sale_value,
-                product_model.available_quantity,
-                product_model.product_status,
-                product_model.product_id
-            )
-
-            product_list.append(product)
-
-            if len(product_list) == 0:
-                raise UnboundLocalError('Nenhum produto cadastrado')
-            else:
-                return product_list
+        return cls._to_response(product_row)
