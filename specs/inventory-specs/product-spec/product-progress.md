@@ -35,12 +35,13 @@
 - Completed T012 by centralizing authenticated-user and admin dependencies in `api/dependencies.py`.
 - Product routes now require the reusable authenticated-user dependency at the router boundary.
 - Product-domain exception-to-HTTP mapping is explicit in `api/routes/inventory_routes/product_routes.py` for validation, category, not-found, duplicate-name, transition, and deletion errors.
+- Completed T013 by creating `tests/contract/test_product_management.py` with contract coverage for authenticated product creation, canonical representation, authentication requirements, empty listing, invalid creation data, category errors, and duplicate canonical names.
 
 ## Where It Stopped
 
-T012 is complete. Authentication and administrator dependencies are centralized, and the Product API boundary has explicit domain-error mapping.
+T013 is complete. Product contract tests exist for the planned creation and listing endpoints, authentication boundary, canonical response data, and documented creation error categories.
 
-No unrelated task was started. Execution stopped before T013.
+No unrelated task was started. Execution stopped before T014.
 
 Validation:
 
@@ -55,10 +56,13 @@ Validation:
 - Selected Category integration suite produced 11 passes and 7 existing authentication-gate failures (`401 Unauthorized`); those failures occurred before the modified service logic was reached.
 - Python syntax validation passed for `schemas/product_schema.py`.
 - Direct schema validation passed for valid creation data, blank names, negative/excess-scale/overflow monetary values, enum parsing, optional query filters, empty updates, partial updates, and explicit null update rejection.
+- Contract test collection passed: 6 tests collected from `tests/contract/test_product_management.py`.
+- Contract test execution currently reports 6 expected failures with `404 Not Found` because the planned `/product` endpoints are not implemented yet; no production code was changed during T013.
+- The contract test run also reported one existing Pydantic deprecation warning in `schemas/user_schema.py`.
 
 ## Next Task
 
-T012 — Centralizar as dependências de autenticação de usuário autenticado e administrador em `api/dependencies.py`, mantendo o mapeamento explícito de erros de domínio em `api/routes/inventory_routes/product_routes.py`.
+T014 — Adicionar testes de integração para criação válida, categoria inexistente/inativa, campos obrigatórios inválidos, preços inválidos, precisão Decimal excessiva e nomes canônicos duplicados em `tests/integration/test_product_create.py`.
 
 ## Required Files
 
@@ -84,3 +88,6 @@ T012 — Centralizar as dependências de autenticação de usuário autenticado 
 - `api/routes/inventory_routes/product_routes.py`
 - `api/routes/auth_routes.py`
 - `domain/exceptions/__init__.py`
+- `tests/conftest.py`
+- `tests/contract/test_product_management.py`
+- `tests/integration/`

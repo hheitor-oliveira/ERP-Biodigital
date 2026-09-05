@@ -42,8 +42,8 @@ description: "Actionable implementation tasks for Product Management"
 - [x] T008 Update the SQLAlchemy product mapping and constraints in `models/inventory_models/product_model.py` for canonical-name uniqueness, required fields, non-negative prices and quantity, explicit defaults, foreign key integrity, and valid statuses
 - [x] T009 Create the Alembic migration in `alembic/versions/<new_product_management_revision>.py` for the Product schema constraints and canonical-name persistence, including upgrade and downgrade paths
 - [x] T010 Refactor shared category-to-domain conversion and active-category validation at the existing Category boundary in `services/inventory/category_service.py`, preserving existing Category behavior
-- [ ] T011 Define typed Product response, create, query-filter, update, and status request schemas in `schemas/product_schema.py` with Decimal precision and enum validation
-- [ ] T012 Centralize authenticated-user and admin dependency usage in `api/dependencies.py`; keep product-domain error-to-HTTP mapping explicit in `api/routes/inventory_routes/product_routes.py`
+- [x] T011 Define typed Product response, create, query-filter, update, and status request schemas in `schemas/product_schema.py` with Decimal precision and enum validation
+- [x] T012 Centralize authenticated-user and admin dependency usage in `api/dependencies.py`; keep product-domain error-to-HTTP mapping explicit in `api/routes/inventory_routes/product_routes.py`
 
 **Checkpoint**: Shared domain, schema, persistence, transaction, and API-boundary primitives are ready; user stories can now be implemented independently.
 
