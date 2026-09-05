@@ -3,7 +3,11 @@ from sqlalchemy.orm import Session
 
 from models.inventory_models.product_model import ProductModel
 from repository.inventory.category_repository import CategoryRepository
-from schemas.product_schema import CreateProductSchema, ProductResponseSchema
+from schemas.product_schema import (
+  CreateProductSchema,
+  ProductQueryFilterSchema,
+  ProductResponseSchema,
+)
 from services.inventory.product_service import ProductService
 from api.dependencies import get_authenticated_user, get_session
 from domain.exceptions import (
@@ -56,9 +60,9 @@ def product_model_to_response(
     id=product_model.product_id,
     name=product_model.product_name,
     category={
-      'id': category_model.category_id,
-      'name': category_model.category_name,
-      'status': category_model.category_status,
+      'id': category_model.category_id, # type: ignore
+      'name': category_model.category_name, # type: ignore
+      'status': category_model.category_status, # type: ignore
     },
     cost_price=product_model.cost_price,
     sale_value=product_model.sale_value,
@@ -96,10 +100,34 @@ async def create_product(
     raise product_domain_error_to_http(exc) from exc
 
 
-@inventory_router.get('/listar',
-                      response_model=(list[ProductResponseSchema]))
-async def listar_produtos(session: Session = Depends(get_session)):
-  
-  products_list = ProductService.list_products(session)
-  
-  return products_list
+@inventory_router.get(
+  '',
+  response_model=list[ProductResponseSchema],
+)
+async def list_products(
+    filters: ProductQueryFilterSchema = Depends(),
+    session: Session = Depends(get_session),
+) -> list[ProductResponseSchema]:
+  return ProductService.list_products(
+    session,
+    name=filters.name,
+    category_id=filters.category_id,
+    status=filters.status,
+  )
+
+
+@inventory_router.get(
+  '/{product_id}',
+  response_model=ProductResponseSchema,
+)
+async def get_product(
+    product_id: int,
+    session: Session = Depends(get_session),
+) -> ProductResponseSchema:
+  product = ProductService.find_product_by_id(product_id, session)
+
+  if product is None:
+    error = ProductNotFoundError('Product not found.')
+    raise product_domain_error_to_http(error)
+
+  return product

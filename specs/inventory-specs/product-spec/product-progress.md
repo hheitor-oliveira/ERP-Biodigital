@@ -64,20 +64,27 @@
 
 ## Where It Stopped
 
-T022 is complete. Execution stopped after implementing and validating the typed Product mapping methods.
+T023 is partially implemented. The authenticated `GET /product` and `GET /product/{product_id}` handlers were added with optional filters, stable empty-list behavior, and `404` mapping for unknown identifiers.
 
-No unrelated implementation task was started. T023 and later tasks were not started.
+Execution stopped after validation exposed defects outside the approved route-handler change:
+
+- Product name filtering remains literal in `ProductRepository._query_products_with_categories()` and does not canonicalize the query value.
+- Query response category names are canonicalized through `CategoryService.to_domain_category()`, while the creation response still exposes the persisted model value, causing representation mismatch in existing tests.
+- One existing create-validation assertion still expects `400` while the approved T017 behavior intentionally returns FastAPI `422`.
+
+No unrelated implementation task was started. The repository/service/schema defects were not changed because they belong to T021/T022/T024 scope and require separate approval.
 
 Validation:
 
-- `.venv/bin/python -m py_compile services/inventory/product_service.py` passed.
-- Direct ProductService mapping validation passed for joined category loading, list filtering, detail mapping, and unknown identifiers.
-- The existing contract/integration query selection reported 16 failures and 5 passes; the failures are expected because the GET route handlers belong to T023 and are not implemented yet. One existing create-validation assertion also remains at HTTP 422, outside T022.
+- `api/routes/inventory_routes/product_routes.py` passed the automatic syntax/lint check after editing.
+- `.venv/bin/python -m pytest tests/contract/test_product_management.py tests/integration/test_product_query.py -q` returned 14 passed and 7 failed.
+- Passing coverage includes authentication requirements, empty results, category/status filters, combined filters, unknown identifiers, and the implemented route behavior.
+- Failed coverage is limited to the name-filter defect, category representation mismatch, and the previously documented `400` versus `422` create-validation expectation.
 - The existing Pydantic deprecation warning in `schemas/user_schema.py` remains.
 
 ## Next Task
 
-T023 — Implementar os handlers autenticados `GET /product` e `GET /product/{product_id}` com filtros opcionais, resposta vazia estável e resposta 404 para identificadores inexistentes.
+T023 continuation — Resolve the identified query name canonicalization and response-representation dependencies, then rerun the T023 contract/integration validation. Required approval is needed before modifying T021/T022/T024-owned code.
 
 ## Required Files
 
@@ -93,6 +100,7 @@ T023 — Implementar os handlers autenticados `GET /product` e `GET /product/{pr
 - `domain/inventory/category.py`
 - `domain/inventory/product.py`
 - `services/inventory/category_service.py`
+- `repository/inventory/product_repository.py`
 - `api/routes/inventory_routes/product_routes.py`
 - `tests/contract/test_product_management.py`
 - `tests/integration/test_product_query.py`
