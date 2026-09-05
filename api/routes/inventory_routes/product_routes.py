@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from models.inventory_models.product_model import ProductModel
+from repository.inventory.category_repository import CategoryRepository
 from schemas.product_schema import CreateProductSchema, ProductResponseSchema
 from services.inventory.product_service import ProductService
 from api.dependencies import get_authenticated_user, get_session
@@ -38,19 +39,52 @@ def product_domain_error_to_http(error: Exception) -> HTTPException:
     return HTTPException(status_code=409, detail=str(error))
   raise error
 
-@inventory_router.post('', status_code=201, response_model=None)
+
+def product_model_to_response(
+    product_model: ProductModel,
+    session: Session,
+) -> ProductResponseSchema:
+  category_model = CategoryRepository.find_category_by_id(
+    product_model.category_id,
+    session,
+  )
+
+  if category_model is None:
+    raise ProductNotFoundError('Product category not found.')
+
+  return ProductResponseSchema(
+    id=product_model.product_id,
+    name=product_model.product_name,
+    category={
+      'id': category_model.category_id,
+      'name': category_model.category_name,
+      'status': category_model.category_status,
+    },
+    cost_price=product_model.cost_price,
+    sale_value=product_model.sale_value,
+    status=product_model.product_status,
+    available_quantity=product_model.available_quantity,
+  )
+
+
+@inventory_router.post(
+  '',
+  status_code=201,
+  response_model=ProductResponseSchema,
+)
 async def create_product(
     product: CreateProductSchema,
     session: Session = Depends(get_session),
-) -> ProductModel:
+) -> ProductResponseSchema:
   try:
-    return ProductService.create_product(
+    product_model = ProductService.create_product(
       product.name,
       product.category_id,
       product.cost_price,
       product.sale_value,
       session,
     )
+    return product_model_to_response(product_model, session)
   except (
     ProductValidationError,
     InvalidProductCategoryError,

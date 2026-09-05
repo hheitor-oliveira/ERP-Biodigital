@@ -3,6 +3,8 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from domain.enums.status import StatusEnum
+from domain.inventory.category import Category
+from models.inventory_models.product_model import ProductModel
 
 
 _MAX_MONEY_VALUE = Decimal("99999999.99")
@@ -133,3 +135,29 @@ class ProductResponseSchema(BaseModel):
     sale_value: Decimal
     status: StatusEnum
     available_quantity: int
+
+    @classmethod
+    def from_model(
+        cls,
+        product_model: ProductModel,
+        category: Category,
+    ) -> "ProductResponseSchema":
+        if product_model.product_id is None:
+            raise ValueError("Persisted product must have an identifier.")
+
+        if category.id is None:
+            raise ValueError("Persisted category must have an identifier.")
+
+        return cls(
+            id=product_model.product_id,
+            name=product_model.product_name,
+            category=CategoryResponseSchema(
+                id=category.id,
+                name=category.name,
+                status=category.status,
+            ),
+            cost_price=product_model.cost_price,
+            sale_value=product_model.sale_value,
+            status=product_model.product_status,
+            available_quantity=product_model.available_quantity,
+        )

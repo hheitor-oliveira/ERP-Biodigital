@@ -47,16 +47,22 @@
 - Product request validation intentionally preserves FastAPI's `422` responses, per the approved scope decision; the contract's `400` validation mapping is not applied.
 - Missing categories map to `404`, inactive categories map to `400`, duplicate canonical names map to `409`, and authentication failures map to `401`.
 - The route uses `response_model=None` temporarily because Product response serialization is assigned to T018.
+- Completed T018 by returning the complete Product representation from `POST /product` with the product identifier, canonical product name, persisted category representation, Decimal prices, status, and available quantity.
+- Product response serialization now uses `ProductResponseSchema` explicitly instead of relying on mismatched SQLAlchemy attribute names.
+- Product creation responses now declare `response_model=ProductResponseSchema` and preserve the persisted category name while exposing the canonical product name.
 
 ## Where It Stopped
 
-T017 is complete. Execution stopped after implementing the authenticated `POST /product` route and its domain-error mapping.
+T018 is complete. Execution stopped after implementing and validating the complete Product response for the authenticated `POST /product` route.
 
-No unrelated implementation task was started. T018 and T023 were not started.
+No unrelated implementation task was started. T019 and later tasks were not started.
 
 Validation:
 
 - `.venv/bin/python -m py_compile api/routes/inventory_routes/product_routes.py` passed.
+- `.venv/bin/python -m py_compile schemas/product_schema.py api/routes/inventory_routes/product_routes.py` passed for T018.
+- `.venv/bin/python -m pytest tests/contract/test_product_management.py -k "create_product_returns_canonical_representation"` passed: 1 selected test passed.
+- `.venv/bin/python -m pytest tests/integration/test_product_create.py -k "persists_valid_canonical_product"` passed: 1 selected test passed.
 - The focused category test passed: missing category returned `404` and inactive category returned `400`.
 - The focused authentication test confirmed `POST /product` returns `401` without valid authentication; its `GET /product` assertion remains failing with `405` because the GET route belongs to T023 and is not implemented.
 - The broader contract/integration run collected 18 tests: 3 passed and 15 failed. The failures are attributable to T018 response serialization, T023 missing `GET /product`, and existing tests that still expect invalid request payloads to return `400` instead of the approved `422` behavior.
@@ -64,7 +70,7 @@ Validation:
 
 ## Next Task
 
-T018 — Retornar a representação completa de Product com categoria, preços Decimal, status e quantidade disponível através de `schemas/product_schema.py` e `api/routes/inventory_routes/product_routes.py`.
+T019 — Adicionar testes de contrato para `GET /product` e `GET /product/{product_id}`, incluindo representações, filtros, array vazio, autenticação e respostas de não encontrado.
 
 ## Required Files
 
@@ -83,3 +89,5 @@ T018 — Retornar a representação completa de Product com categoria, preços D
 - `services/inventory/category_service.py`
 - `tests/contract/test_product_management.py`
 - `tests/integration/test_product_create.py`
+- `repository/inventory/product_repository.py`
+- `tests/conftest.py`
