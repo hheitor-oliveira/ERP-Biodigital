@@ -2,6 +2,8 @@
 
 ## What Was Done
 
+- Completed T035 by canonicalizing names in `UpdateProductSchema` before service/domain processing and explicitly serializing Product monetary response fields as two-decimal strings through Pydantic field serializers.
+- The Product domain already enforced canonicalization through `normalize_product_name()` in construction, restore, and `change_name()`; no additional domain change was required.
 - Completed T028 by implementing prospective-state product updates across `repository/inventory/product_repository.py` and `services/inventory/product_service.py`.
 - Product updates now preserve omitted fields, canonicalize names through the Product domain, validate the complete prospective state before persistence, require replacement categories to be active, and reject missing products without creating rows.
 - Product repository updates assign the complete validated state and perform exactly one commit with refresh; SQLAlchemy failures roll back and re-raise the original exception.
@@ -82,18 +84,20 @@
 
 ## Where It Stopped
 
-T034 is complete. `PATCH /product/{product_id}` now validates partial update payloads, requires an administrator, rejects empty updates with the stable `400` error, delegates prospective-state validation and atomic persistence to `ProductService.update_product`, serializes the complete updated representation, and maps product-domain errors to the documented HTTP responses.
+T035 is complete. Updated Product names are canonicalized at schema validation, and Product monetary response fields are serialized explicitly with two decimal places while remaining `Decimal` values internally.
 
 Validation:
 
-- `.venv/bin/python -m pytest tests/integration/test_product_update.py -q -k 'update_product_name_preserves_omitted_fields or update_product_multiple_fields_returns_complete_representation or non_admin_cannot_update_product or update_product_rejects_invalid_prices or update_product_rejects_duplicate_canonical_name or update_product_rejects_missing_category_without_changes or update_product_rejects_inactive_category_without_changes or update_product_preserves_identifier_and_state_after_atomic_failure or update_of_missing_product_does_not_create_row or delete_product_rejects_and_preserves_row'` returned 11 passed, 2 deselected, and 1 existing Pydantic deprecation warning.
+- `.venv/bin/python -m pytest tests/integration/test_product_update.py tests/contract/test_product_management.py -q -k 'update_product or product_update or admin_can_partially_update_product or admin_can_update_multiple_product_fields'` returned 18 passed, 3 failed, 13 deselected, and 1 existing Pydantic deprecation warning. The failures are pre-existing expectation mismatches: one integration test expects `400` for Pydantic price validation that returns `422`, and two contract tests use a non-admin client while expecting business responses and therefore return `401`.
+- `.venv/bin/python -m compileall -q schemas/product_schema.py domain/inventory/product.py` completed successfully.
+- `.venv/bin/python -m pytest tests/integration/test_product_update.py -q -k 'update_product_name_preserves_omitted_fields or update_product_multiple_fields_returns_complete_representation or non_admin_cannot_update_product or update_product_rejects_invalid_prices or update_product_rejects_duplicate_canonical_name or update_product_rejects_missing_category_without_changes or update_product_rejects_inactive_category_without_changes or update_product_preserves_identifier_and_state_after_atomic_failure or update_of_missing_product_does_not_create_row or delete_product_rejects_and_preserves_row' returned 11 passed, 2 deselected, and 1 existing Pydantic deprecation warning.
 - `.venv/bin/python -m pytest tests/contract/test_product_management.py -q -k 'admin_can_partially_update_product or non_admin_cannot_update_product or product_update_requires_authentication or product_update_rejects_invalid_payload or product_update_rejects_duplicate_name'` returned 3 passed, 18 deselected, and 1 existing Pydantic deprecation warning.
 - `.venv/bin/python -m compileall -q api/routes/inventory_routes/product_routes.py` completed successfully.
 - The combined update test run still has 3 failures caused by pre-existing incompatible expectations: two contract tests use the non-admin `authenticated_client` while expecting business responses, and one integration test expects `400` for Pydantic price validation that returns `422`. No production behavior was changed to weaken authorization or override FastAPI validation semantics.
 
 ## Next Task
 
-T035 — Enforce canonicalization and Decimal serialization for updated Product values in `schemas/product_schema.py` and `domain/inventory/product.py`. Do not begin T035 until explicitly approved.
+T036 — Add contract tests for `PATCH /product/{product_id}/status`, all status values, authorization, preserved representation, and error categories in `tests/contract/test_product_management.py`. Do not begin T036 until explicitly approved.
 
 ## Required Files
 

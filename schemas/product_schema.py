@@ -1,6 +1,12 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_serializer,
+    field_validator,
+)
 
 from domain.enums.status import StatusEnum
 from domain.inventory.category import Category
@@ -91,7 +97,8 @@ class UpdateProductSchema(BaseModel):
         if value is None:
             raise ValueError("Product name cannot be null.")
 
-        return validate_product_name(value)
+        validate_product_name(value)
+        return " ".join(value.split()).upper()
 
     @field_validator("cost_price", "sale_value")
     @classmethod
@@ -141,6 +148,10 @@ class ProductResponseSchema(BaseModel):
     sale_value: Decimal
     status: StatusEnum = Field(validation_alias="product_status")
     available_quantity: int
+
+    @field_serializer("cost_price", "sale_value")
+    def serialize_money(self, value: Decimal) -> str:
+        return f"{value:.2f}"
 
     @classmethod
     def from_model(
