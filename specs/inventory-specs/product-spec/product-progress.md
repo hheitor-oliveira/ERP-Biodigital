@@ -41,45 +41,39 @@
 - Product persistence now explicitly stores the canonical name, category identifier, prices, available quantity, and status.
 - Product creation now returns the persisted `ProductModel` after commit and refresh.
 - SQLAlchemy persistence failures now roll back the session and re-raise the original exception, preserving single-transaction behavior.
+- Completed T016 by implementing authenticated product-creation service validation through the active-category boundary and Product domain invariants.
+- Product creation now explicitly initializes `available_quantity` to zero and `status` to `StatusEnum.ACTIVE`, returns the persisted `ProductModel`, and translates product-create integrity failures into `DuplicateProductNameError`.
 
 ## Where It Stopped
 
-T015 is complete. Execution stopped after implementing and validating Product repository construction and transactional create/rollback behavior.
+T016 is complete. Execution stopped after implementing Product creation service validation and duplicate-integrity translation.
 
-No unrelated task was started. T016 was not started.
+No unrelated task was started. T017 was not started.
 
 Validation:
 
-- `.venv/bin/python -m py_compile repository/inventory/product_repository.py` passed.
-- Product integration test collection passed: 12 tests collected from `tests/integration/test_product_create.py`.
-- An isolated SQLAlchemy transaction smoke test passed: the first Product creation committed, a duplicate creation raised the database integrity error, rollback executed, and the session remained usable with exactly one persisted product.
-- The collection run reported the existing Pydantic deprecation warning in `schemas/user_schema.py`.
-- Full T014 endpoint execution remains blocked by the previously recorded missing `/product` implementation; T016–T018 are required before those tests can pass.
+- `.venv/bin/python -m py_compile services/inventory/product_service.py` passed.
+- `.venv/bin/python -m pytest tests/integration/test_product_create.py -q` collected and executed 12 tests: 1 passed and 11 failed because `/product` is not yet implemented and returned `404` for the endpoint scenarios.
+- The failed endpoint execution is an existing dependency on T017/T018, not a service syntax failure.
+- The run reported the existing Pydantic deprecation warning in `schemas/user_schema.py`.
+- Repository-level transaction smoke validation from T015 remains passed.
 
 ## Next Task
 
-T016 — Implementar a validação de criação autenticada, categoria ativa, nome canônico, preços, quantidade inicial e erros de integridade duplicada em `services/inventory/product_service.py`.
+T017 — Implementar `POST /product` em `api/routes/inventory_routes/product_routes.py` com autenticação bearer, resposta `201` e mapeamento estável de erros `400`, `404`, `409` e `401`.
 
 ## Required Files
 
 - `.specify/memory/constitution.md`
 - `specs/inventory-specs/product-spec/product-progress.md`
 - `specs/inventory-specs/product-spec/tasks.md`
-- `specs/inventory-specs/product-spec/plan.md`
-- `specs/inventory-specs/product-spec/research.md`
-- `specs/inventory-specs/product-spec/data-model.md`
 - `specs/inventory-specs/product-spec/contracts/product-api.md`
-- `models/inventory_models/product_model.py`
-- `models/inventory_models/category_model.py`
-- `domain/enums/status.py`
-- `domain/inventory/category.py`
-- `domain/inventory/product.py`
+- `api/dependencies.py`
+- `api/routes/inventory_routes/product_routes.py`
 - `domain/exceptions/__init__.py`
-- `repository/inventory/category_repository.py`
-- `repository/inventory/product_repository.py`
-- `services/inventory/category_service.py`
 - `services/inventory/product_service.py`
 - `schemas/product_schema.py`
+- `models/user_model/user_model.py`
 - `tests/conftest.py`
 - `tests/contract/test_product_management.py`
 - `tests/integration/test_product_create.py`

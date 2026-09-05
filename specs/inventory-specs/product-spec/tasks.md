@@ -57,12 +57,12 @@ description: "Actionable implementation tasks for Product Management"
 
 ### Tests for User Story 1
 
-- [ ] T013 [P] [US1] Add contract tests for `POST /product` request/response, authentication, status `201`, canonical name, ACTIVE status, and quantity zero in `tests/contract/test_product_management.py`
-- [ ] T014 [P] [US1] Add integration tests for valid creation, missing category, inactive category, invalid required fields, negative prices, excessive Decimal scale, and duplicate canonical names in `tests/integration/test_product_create.py`
+- [x] T013 [P] [US1] Add contract tests for `POST /product` request/response, authentication, status `201`, canonical name, ACTIVE status, and quantity zero in `tests/contract/test_product_management.py`
+- [x] T014 [P] [US1] Add integration tests for valid creation, missing category, inactive category, invalid required fields, negative prices, excessive Decimal scale, and duplicate canonical names in `tests/integration/test_product_create.py`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Implement typed Product persistence construction and single-transaction create/rollback behavior in `repository/inventory/product_repository.py`
+- [x] T015 [US1] Implement typed Product persistence construction and single-transaction create/rollback behavior in `repository/inventory/product_repository.py`
 - [ ] T016 [US1] Implement authenticated create validation for active category, canonical name, prices, initial quantity, and duplicate integrity errors in `services/inventory/product_service.py`
 - [ ] T017 [US1] Implement `POST /product` at `api/routes/inventory_routes/product_routes.py` with bearer authentication, `201` response, and stable `400`, `404`, `409`, and `401` error mapping
 - [ ] T018 [US1] Return the created Product representation with category, Decimal prices, status, and available quantity through `schemas/product_schema.py` and `api/routes/inventory_routes/product_routes.py`
