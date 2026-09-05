@@ -587,3 +587,213 @@ def test_product_update_rejects_duplicate_canonical_name(
     assert second_response.status_code == 201
     assert response.status_code == 409
     assert "detail" in response.json()
+
+
+@pytest.mark.parametrize("status", ["ACTIVE", "INACTIVE", "DISCONTINUED"])
+def test_admin_can_update_product_status_and_preserve_representation(
+    admin_client,
+    category_factory,
+    status,
+):
+    category = category_factory()
+    create_response = admin_client.post(
+        "/product",
+        json={
+            "name": "Status Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product = create_response.json()
+
+    response = admin_client.patch(
+        f"/product/{product['id']}/status",
+        json={"status": status},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": product["id"],
+        "name": "STATUS PRODUCT",
+        "category": {
+            "id": category.category_id,
+            "name": "CATEGORIA VÁLIDA",
+            "status": "ACTIVE",
+        },
+        "cost_price": "10.00",
+        "sale_value": "15.00",
+        "status": status,
+        "available_quantity": 0,
+    }
+
+
+def test_admin_can_complete_allowed_product_status_transitions(
+    admin_client,
+    category_factory,
+):
+    category = category_factory()
+    create_response = admin_client.post(
+        "/product",
+        json={
+            "name": "Transition Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product_id = create_response.json()["id"]
+
+    inactive_response = admin_client.patch(
+        f"/product/{product_id}/status",
+        json={"status": "INACTIVE"},
+    )
+    active_response = admin_client.patch(
+        f"/product/{product_id}/status",
+        json={"status": "ACTIVE"},
+    )
+    discontinued_response = admin_client.patch(
+        f"/product/{product_id}/status",
+        json={"status": "DISCONTINUED"},
+    )
+
+    assert inactive_response.status_code == 200
+    assert inactive_response.json()["status"] == "INACTIVE"
+    assert active_response.status_code == 200
+    assert active_response.json()["status"] == "ACTIVE"
+    assert discontinued_response.status_code == 200
+    assert discontinued_response.json()["status"] == "DISCONTINUED"
+    assert discontinued_response.json()["id"] == product_id
+
+
+def test_non_admin_cannot_update_product_status(
+    authenticated_client,
+    category_factory,
+):
+    category = category_factory()
+    create_response = authenticated_client.post(
+        "/product",
+        json={
+            "name": "Protected Status Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product_id = create_response.json()["id"]
+
+    response = authenticated_client.patch(
+        f"/product/{product_id}/status",
+        json={"status": "INACTIVE"},
+    )
+
+    assert response.status_code == 401
+    assert "detail" in response.json()
+
+
+def test_product_status_update_requires_bearer_authentication(client, app):
+    app.dependency_overrides[verify_access_token] = unauthenticated_request
+    try:
+        response = client.patch(
+            "/product/1/status",
+            json={"status": "INACTIVE"},
+        )
+    finally:
+        app.dependency_overrides.pop(verify_access_token, None)
+
+    assert response.status_code == 401
+    assert "detail" in response.json()
+
+
+def test_product_status_update_returns_not_found_for_unknown_product(
+    admin_client,
+):
+    response = admin_client.patch(
+        "/product/999999/status",
+        json={"status": "INACTIVE"},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Product not found."}
+
+
+def test_product_status_update_rejects_unknown_status(
+    admin_client,
+    category_factory,
+):
+    category = category_factory()
+    create_response = admin_client.post(
+        "/product",
+        json={
+            "name": "Validated Status Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product_id = create_response.json()["id"]
+
+    response = admin_client.patch(
+        f"/product/{product_id}/status",
+        json={"status": "UNKNOWN"},
+    )
+
+    assert response.status_code == 422
+    assert "detail" in response.json()
+
+
+def test_product_status_update_rejects_invalid_transition(
+    admin_client,
+    category_factory,
+):
+    category = category_factory()
+    create_response = admin_client.post(
+        "/product",
+        json={
+            "name": "Invalid Transition Product",
+            "category_id": category.category_id,
+            "cost_price": "10.00",
+            "sale_value": "15.00",
+        },
+    )
+    product_id = create_response.json()["id"]
+
+    first_response = admin_client.patch(
+        f"/product/{product_id}/status",
+        json={"status": "INACTIVE"},
+    )
+    response = admin_client.patch(
+        f"/product/{product_id}/status",
+        json={"status": "DISCONTINUED"},
+    )
+
+    assert first_response.status_code == 200
+    assert response.status_code == 400
+    assert "detail" in response.json()
+
+
+def test_product_status_update_rejects_reactivation_with_inactive_category(
+    admin_client,
+    category_factory,
+    db_session,
+):
+    category = category_factory(status=StatusEnum.INACTIVE)
+    product = ProductModel(
+        category_id=category.category_id,
+        product_name="INACTIVE CATEGORY PRODUCT",
+        cost_price=Decimal("10.00"),
+        sale_value=Decimal("15.00"),
+        available_quantity=0,
+        product_status=StatusEnum.INACTIVE,
+    )
+    db_session.add(product)
+    db_session.commit()
+    db_session.refresh(product)
+
+    response = admin_client.patch(
+        f"/product/{product.product_id}/status",
+        json={"status": "ACTIVE"},
+    )
+
+    assert response.status_code == 400
+    assert "detail" in response.json()

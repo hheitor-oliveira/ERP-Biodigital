@@ -84,7 +84,10 @@
 
 ## Where It Stopped
 
-T035 is complete. Updated Product names are canonicalized at schema validation, and Product monetary response fields are serialized explicitly with two decimal places while remaining `Decimal` values internally.
+- T037 is complete. Created `tests/integration/test_product_status.py` with coverage for allowed transitions, idempotent transitions, active-category reactivation, invalid transitions, inactive-category reactivation rejection, missing products, invalid statuses, record preservation, and status-dependent stock/sale capability predicates.
+- T036 is complete. Added contract coverage for `PATCH /product/{product_id}/status` in `tests/contract/test_product_management.py`.
+- The new contract coverage exercises all three status values, preserved complete Product representation, allowed transition sequences, admin authorization, bearer authentication, missing products, unknown status validation, invalid transitions, and reactivation with an inactive category.
+- T035 is complete. Updated Product names are canonicalized at schema validation, and Product monetary response fields are serialized explicitly with two decimal places while remaining `Decimal` values internally.
 
 Validation:
 
@@ -94,17 +97,22 @@ Validation:
 - `.venv/bin/python -m pytest tests/contract/test_product_management.py -q -k 'admin_can_partially_update_product or non_admin_cannot_update_product or product_update_requires_authentication or product_update_rejects_invalid_payload or product_update_rejects_duplicate_name'` returned 3 passed, 18 deselected, and 1 existing Pydantic deprecation warning.
 - `.venv/bin/python -m compileall -q api/routes/inventory_routes/product_routes.py` completed successfully.
 - The combined update test run still has 3 failures caused by pre-existing incompatible expectations: two contract tests use the non-admin `authenticated_client` while expecting business responses, and one integration test expects `400` for Pydantic price validation that returns `422`. No production behavior was changed to weaken authorization or override FastAPI validation semantics.
+- `.venv/bin/python -m pytest tests/contract/test_product_management.py -q -k 'status'` returned 1 passed and 10 failed. The failures are expected because `PATCH /product/{product_id}/status` is not implemented yet; the current application returns `404 Not Found` instead of the status endpoint contract responses. The passing test is the existing product-list status filter test selected by the `status` keyword.
+- `.venv/bin/python -m compileall -q tests/contract/test_product_management.py` completed successfully.
+- `.venv/bin/python -m pytest tests/integration/test_product_status.py -q` returned 3 passed and 12 failed. The 3 capability-predicate tests passed; the 12 status-service tests fail because `ProductService.change_product_status` is not implemented yet, as expected before T039.
+- `.venv/bin/python -m compileall -q tests/integration/test_product_status.py` completed successfully.
 
 ## Next Task
 
-T036 — Add contract tests for `PATCH /product/{product_id}/status`, all status values, authorization, preserved representation, and error categories in `tests/contract/test_product_management.py`. Do not begin T036 until explicitly approved.
+T038 — Implement typed repository status lookup/update with one-transaction commit and rollback in `repository/inventory/product_repository.py`. Do not begin T038 until explicitly approved.
 
 ## Required Files
 
 - `.specify/memory/constitution.md`
 - `specs/inventory-specs/product-spec/product-progress.md`
 - `specs/inventory-spec/product-spec/tasks.md`
-- `schemas/product_schema.py`
 - `domain/inventory/product.py`
-- `tests/contract/test_product_management.py`
-- `tests/integration/test_product_update.py`
+- `models/inventory_models/product_model.py`
+- `repository/inventory/product_repository.py`
+- `services/inventory/product_service.py`
+- `tests/integration/test_product_status.py`
