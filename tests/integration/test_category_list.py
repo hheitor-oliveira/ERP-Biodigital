@@ -5,13 +5,13 @@ from domain.enums.status import StatusEnum
 
 @pytest.mark.integration
 def test_list_categories_endpoint_returns_active_and_inactive_categories(
-    client,
+    authenticated_client,
     category_factory,
 ):
     category_factory(name="Categoria Ativa", status=StatusEnum.ACTIVE)
     category_factory(name="Categoria Inativa", status=StatusEnum.INACTIVE)
 
-    response = client.get("/category/list")
+    response = authenticated_client.get("/category/list")
 
     assert response.status_code == 200
 
@@ -33,9 +33,9 @@ def test_list_categories_endpoint_returns_active_and_inactive_categories(
 
 @pytest.mark.integration
 def test_list_categories_endpoint_returns_empty_list_when_no_categories_exist(
-    client,
+    authenticated_client,
 ):
-    response = client.get("/category/list")
+    response = authenticated_client.get("/category/list")
 
     assert response.status_code == 200
     assert response.json() == []

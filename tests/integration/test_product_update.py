@@ -114,7 +114,7 @@ def test_failed_update_preserves_product_state(
     db_session.expire_all()
     persisted_product = db_session.get(ProductModel, product_id)
 
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert persisted_product.product_id == product_id
     assert persisted_product.product_name == "ATOMIC PRODUCT"
     assert persisted_product.cost_price == Decimal("10.00")

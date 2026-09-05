@@ -121,7 +121,7 @@ def test_create_product_rejects_missing_required_fields(
         json=payload,
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
 @pytest.mark.parametrize(
@@ -148,7 +148,7 @@ def test_create_product_rejects_negative_prices(
         ),
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
 @pytest.mark.parametrize(
@@ -175,7 +175,7 @@ def test_create_product_rejects_excessive_decimal_scale(
         ),
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
 def test_create_product_rejects_duplicate_canonical_name(

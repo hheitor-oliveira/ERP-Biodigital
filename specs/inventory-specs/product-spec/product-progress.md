@@ -2,6 +2,13 @@
 
 ## What Was Done
 
+- Completed T045-resolution with test-only corrections for all 18 stale baseline failures. Product update contract cases now use the admin fixture, Category endpoint integration cases now use an authenticated fixture that overrides both `get_authenticated_user` and the router's direct `verify_access_token` dependency, and Product schema-validation expectations now use HTTP `422`.
+- No production code was changed during T045-resolution. The corrections preserve the existing admin authorization, Category authentication boundary, and FastAPI/Pydantic validation behavior.
+- The shared `tests/conftest.py` fixture provides an authenticated non-admin client for endpoint tests that require authentication but not administrative privileges.
+- Completed T046 by recording the observed migration, API response, authorization, database read-back, transaction, status-lifecycle, deletion-protection, and automated-validation evidence in `specs/inventory-specs/product-spec/quickstart.md`.
+- Concluída a investigação T045-investigation das 18 falhas do baseline. Não foram identificados defeitos de produção: as falhas são expectativas/fixtures desatualizados em relação à autenticação atual e à semântica `422` de validação Pydantic.
+- Executada a validação completa da T045 para obter o baseline da suíte; foram identificadas 18 falhas, portanto a confirmação de regressão completa permanece pendente.
+- Completed T044 by running the PostgreSQL-specific validation command; all 9 selected tests passed without production-code changes.
 - Completed T042 by reviewing all Product functions, methods, route handlers, repositories, and schemas listed for the task. All parameters and return values have explicit type annotations; no source-code change was necessary.
 - Completed T035 by canonicalizing names in `UpdateProductSchema` before service/domain processing and explicitly serializing Product monetary response fields as two-decimal strings through Pydantic field serializers.
 - The Product domain already enforced canonicalization through `normalize_product_name()` in construction, restore, and `change_name()`; no additional domain change was required.
@@ -85,7 +92,14 @@
 
 ## Where It Stopped
 
+- T045-resolution is complete. The affected test set returned `66 passed` and one existing Pydantic deprecation warning. The complete regression suite returned `107 passed` and one existing Pydantic deprecation warning in 11.90 seconds. No production behavior was changed.
+- During the first correction attempt, the Category endpoint tests still returned `401` because the router depends directly on `verify_access_token`; the shared fixture was corrected to override that dependency as well. The affected test set was rerun successfully afterward.
+- T046 is complete. The acceptance evidence was documented in the quickstart using the observed statuses and persistence/transaction read-back results. No additional code or test execution was required for this documentation-only task.
+- T045-investigation stopped after tracing the 18 failures to their test fixtures and declared expectations. Product admin routes correctly reject the non-admin contract fixture with `401`; Category routes correctly reject unauthenticated integration clients with `401`; Product request-schema failures correctly return FastAPI/Pydantic `422` before route handlers execute. No source or test changes were made.
+- T045 stopped after the complete suite reproduced 18 failures. The failures remain grouped into two Product contract authorization-fixture mismatches, seven Category integration authentication-fixture mismatches, eight Product creation validation-status expectation mismatches, and one Product update validation-status expectation mismatch. No production code or tests were changed.
 - T042 is complete. The annotation audit found no missing parameter or return annotations in the six required Product files, and no implementation change was required.
+- T044 is complete. PostgreSQL-specific validation passed all selected tests without production-code changes.
+- T043 stopped after successful migration and execution of the selected validation command. The command did not satisfy the expected all-pass result because 18 tests failed with the documented authorization-fixture and `400` versus `422` expectation mismatches; no production code or tests were changed.
 - T040 is complete. Implemented `PATCH /product/{product_id}/status` in `api/routes/inventory_routes/product_routes.py` using `ProductStatusUpdateSchema`, `ProductService.change_product_status()`, complete Product response serialization, and explicit product-domain error mapping.
 - Status enum validation remains handled by Pydantic with `422` responses, while missing products map to `404`, invalid transitions and inactive-category reactivation map to `400`, and authentication/admin failures are enforced by the existing dependencies.
 - T037 is complete. Created `tests/integration/test_product_status.py` with coverage for allowed transitions, idempotent transitions, active-category reactivation, invalid transitions, inactive-category reactivation rejection, missing products, invalid statuses, record preservation, and status-dependent stock/sale capability predicates.
@@ -121,24 +135,22 @@ Validation:
 - PostgreSQL `NUMERIC(10,2)` accepts a value with excessive scale by normalizing it; therefore T041 validates the declared precision boundary and overflow rejection, while excessive-scale rejection remains covered by the application schema rather than being falsely attributed to a database constraint.
 - `.venv/bin/python -m compileall -q domain/inventory/product.py models/inventory_models/product_model.py repository/inventory/product_repository.py services/inventory/product_service.py schemas/product_schema.py api/routes/inventory_routes/product_routes.py` completed successfully for T042.
 - The T042 AST annotation audit returned no functions or methods with missing parameter or return annotations.
+- T043 migration and selected contract/integration validation were executed. `alembic upgrade head` completed successfully against PostgreSQL.
+- `.venv/bin/python -m pytest tests/ -m "contract or integration"` returned 89 passed, 18 failed, and 1 existing Pydantic deprecation warning in 8.98 seconds.
+- The 18 failures are expectation/fixture mismatches: two Product contract tests use a non-admin client while expecting business responses and receive `401`; seven existing Category integration tests use an unauthenticated client and receive `401`; eight Product create/update integration tests expect `400` for Pydantic validation while the application correctly returns `422`; and one Product update integration test has the same `422` expectation mismatch.
+- T044 validation: `.venv/bin/python -m pytest tests/ -m postgres` returned 9 passed, 98 deselected, and 1 existing Pydantic deprecation warning in 1.55 seconds. The selected PostgreSQL constraint/transaction tests completed successfully.
+- T045 baseline validation: `.venv/bin/python -m pytest` returned 89 passed, 18 failed, and 1 existing Pydantic deprecation warning in 8.33 seconds. The 18 failures were: 2 Product contract tests returning `401` instead of business responses because `authenticated_client` is non-admin; 7 Category integration tests returning `401` instead of business responses because they use an unauthenticated `client`; 8 Product create tests expecting `400` while Pydantic returns `422`; and 1 Product update test expecting `400` while Pydantic returns `422`.
+- T045-investigation evidence: `tests/contract/test_product_management.py` defines `authenticated_user.admin=False`, while `api/routes/inventory_routes/product_routes.py` protects `PATCH /product/{product_id}` with `get_admin_user`; `api/routes/inventory_routes/category_routes.py` protects all Category routes with `verify_access_token`, while the failing Category tests use the unauthenticated `client`; `schemas/product_schema.py` validates Product request fields before route execution, producing FastAPI `422`; existing Product contract/update tests already assert `422` for equivalent schema failures. These findings classify all 18 failures as stale test fixtures or expectations, not production defects.
 
 ## Next Task
 
-T043 — Run the migration and selected contract/integration validation from `specs/inventory-specs/product-spec/quickstart.md`, including `.venv/bin/python -m pytest tests/ -m "contract or integration"`. Do not begin T043 until explicitly approved.
+No further task is defined in the current Product Management task list. Await a new task or explicit follow-up scope.
 
 ## Required Files
 
 - `.specify/memory/constitution.md`
 - `specs/inventory-specs/product-spec/product-progress.md`
 - `specs/inventory-specs/product-spec/tasks.md`
-- `domain/inventory/product.py`
-- `models/inventory_models/product_model.py`
-- `repository/inventory/product_repository.py`
-- `services/inventory/product_service.py`
-- `schemas/product_schema.py`
-- `api/routes/inventory_routes/product_routes.py`
 - `specs/inventory-specs/product-spec/quickstart.md`
-- `alembic.ini`
-- `alembic/env.py`
-- `tests/conftest.py`
-- `pytest.ini`
+- `specs/inventory-specs/product-spec/contracts/product-api.md`
+- `specs/inventory-specs/product-spec/data-model.md`

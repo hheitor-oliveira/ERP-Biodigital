@@ -4,8 +4,8 @@ from models.inventory_models.category_model import CategoryModel
 
 
 @pytest.mark.integration
-def test_create_category_endpoint_returns_active_category(client, db_session):
-    response = client.post("/category/create", json={"name": "Categoria Válida"})
+def test_create_category_endpoint_returns_active_category(authenticated_client, db_session):
+    response = authenticated_client.post("/category/create", json={"name": "Categoria Válida"})
 
     assert response.status_code == 200
 
@@ -21,9 +21,9 @@ def test_create_category_endpoint_returns_active_category(client, db_session):
 
 @pytest.mark.integration
 def test_create_category_endpoint_rejects_name_shorter_than_five_characters(
-    client,
+    authenticated_client,
 ):
-    response = client.post("/category/create", json={"name": "ABCD"})
+    response = authenticated_client.post("/category/create", json={"name": "ABCD"})
 
     assert response.status_code == 400
     assert response.json() == {

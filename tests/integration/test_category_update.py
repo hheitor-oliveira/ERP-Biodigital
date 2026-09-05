@@ -47,12 +47,12 @@ def test_rename_category_rejects_name_already_used_by_another_category(
 
 @pytest.mark.integration
 def test_rename_category_endpoint_rejects_name_shorter_than_five_characters(
-    client,
+    authenticated_client,
     category_factory,
 ):
     category = category_factory()
 
-    response = client.put(
+    response = authenticated_client.put(
         f"/category/{category.category_id}/rename",
         json={"name": "ABCD"},
     )

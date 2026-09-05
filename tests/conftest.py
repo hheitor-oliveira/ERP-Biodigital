@@ -14,12 +14,17 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from api.app import app as fastapi_app
-from api.dependencies import get_session
+from api.dependencies import (
+    get_authenticated_user,
+    get_session,
+    verify_access_token,
+)
 from domain.enums.status import StatusEnum
 from domain.inventory.category import Category
 from models.base import Base
 from models.inventory_models.category_model import CategoryModel  # noqa: F401
 from models.inventory_models.product_model import ProductModel  # noqa: F401
+from models.user_model.user_model import UserModel
 
 
 @pytest.fixture(scope="session")
@@ -64,6 +69,24 @@ def app(db_session):
 def client(app):
     with TestClient(app) as test_client:
         yield test_client
+
+
+@pytest.fixture()
+def authenticated_client(client, app):
+    authenticated_user = UserModel(
+        user_id=1,
+        user_name="Integration User",
+        user_email="integration@example.com",
+        user_password="hashed-password",
+        admin=False,
+    )
+    app.dependency_overrides[get_authenticated_user] = (
+        lambda: authenticated_user
+    )
+    app.dependency_overrides[verify_access_token] = lambda: authenticated_user
+    yield client
+    app.dependency_overrides.pop(get_authenticated_user, None)
+    app.dependency_overrides.pop(verify_access_token, None)
 
 
 @pytest.fixture()

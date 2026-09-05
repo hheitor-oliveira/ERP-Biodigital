@@ -44,8 +44,8 @@ def test_inactivate_category_preserves_linked_product_association(
 
 
 @pytest.mark.integration
-def test_change_category_status_returns_not_found_for_missing_category(client):
-    response = client.patch(
+def test_change_category_status_returns_not_found_for_missing_category(authenticated_client):
+    response = authenticated_client.patch(
         "/category/999/status",
         json={"status": "INACTIVE"},
     )
@@ -55,10 +55,10 @@ def test_change_category_status_returns_not_found_for_missing_category(client):
 
 
 @pytest.mark.integration
-def test_change_category_status_rejects_unknown_status(client, category_factory):
+def test_change_category_status_rejects_unknown_status(authenticated_client, category_factory):
     category = category_factory()
 
-    response = client.patch(
+    response = authenticated_client.patch(
         f"/category/{category.category_id}/status",
         json={"status": "UNKNOWN"},
     )

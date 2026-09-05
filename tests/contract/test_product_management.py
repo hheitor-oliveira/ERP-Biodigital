@@ -372,9 +372,9 @@ def test_product_deletion_endpoint_is_not_exposed(
 
 
 def test_product_update_returns_stable_not_found_error(
-    authenticated_client,
+    admin_client,
 ):
-    response = authenticated_client.patch(
+    response = admin_client.patch(
         "/product/999999",
         json={"name": "Updated Product"},
     )
@@ -384,11 +384,11 @@ def test_product_update_returns_stable_not_found_error(
 
 
 def test_product_update_rejects_empty_payload_with_stable_error(
-    authenticated_client,
+    admin_client,
     category_factory,
 ):
     category = category_factory()
-    create_response = authenticated_client.post(
+    create_response = admin_client.post(
         "/product",
         json={
             "name": "Atomic Product",
@@ -399,7 +399,7 @@ def test_product_update_rejects_empty_payload_with_stable_error(
     )
     product_id = create_response.json()["id"]
 
-    response = authenticated_client.patch(
+    response = admin_client.patch(
         f"/product/{product_id}",
         json={},
     )
