@@ -132,7 +132,9 @@ class ProductRepository:
 
         if product_name is not None:
             query = query.where(
-                ProductModel.product_name == normalize_product_name(product_name)
+                ProductModel.product_name.ilike(
+                    f"%{normalize_product_name(product_name)}%"
+                )
             )
 
         if category_id is not None:

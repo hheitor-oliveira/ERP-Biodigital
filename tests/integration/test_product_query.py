@@ -135,7 +135,7 @@ def test_get_product_returns_complete_persisted_representation(
     assert response.json() == product
 
 
-def test_list_products_filters_by_case_insensitive_canonical_name(
+def test_list_products_filters_by_case_insensitive_partial_name(
     authenticated_integration_client,
     category_factory,
 ):
@@ -153,7 +153,7 @@ def test_list_products_filters_by_case_insensitive_canonical_name(
 
     response = authenticated_integration_client.get(
         "/product",
-        params={"name": "blue   widget"},
+        params={"name": "blue   wid"},
     )
 
     assert response.status_code == 200

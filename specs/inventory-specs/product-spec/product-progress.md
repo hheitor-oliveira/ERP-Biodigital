@@ -2,6 +2,8 @@
 
 ## What Was Done
 
+- Implementada a pesquisa parcial de produtos por nome em `repository/inventory/product_repository.py`. O filtro agora usa `ilike` com o termo normalizado entre curingas, retornando produtos cujo nome contenha a pesquisa sem alterar os filtros de categoria, status ou a ordenação.
+- Atualizados os testes de contrato e integração de listagem para validar pesquisa parcial case-insensitive (`blue   wid`).
 - Completed T045-resolution with test-only corrections for all 18 stale baseline failures. Product update contract cases now use the admin fixture, Category endpoint integration cases now use an authenticated fixture that overrides both `get_authenticated_user` and the router's direct `verify_access_token` dependency, and Product schema-validation expectations now use HTTP `422`.
 - No production code was changed during T045-resolution. The corrections preserve the existing admin authorization, Category authentication boundary, and FastAPI/Pydantic validation behavior.
 - The shared `tests/conftest.py` fixture provides an authenticated non-admin client for endpoint tests that require authentication but not administrative privileges.
@@ -92,6 +94,7 @@
 
 ## Where It Stopped
 
+- A alteração da pesquisa parcial foi concluída e validada; não há pendências dentro do escopo solicitado.
 - T045-resolution is complete. The affected test set returned `66 passed` and one existing Pydantic deprecation warning. The complete regression suite returned `107 passed` and one existing Pydantic deprecation warning in 11.90 seconds. No production behavior was changed.
 - During the first correction attempt, the Category endpoint tests still returned `401` because the router depends directly on `verify_access_token`; the shared fixture was corrected to override that dependency as well. The affected test set was rerun successfully afterward.
 - T046 is complete. The acceptance evidence was documented in the quickstart using the observed statuses and persistence/transaction read-back results. No additional code or test execution was required for this documentation-only task.
@@ -114,6 +117,7 @@
 
 Validation:
 
+- `.venv/bin/python -m pytest tests/integration/test_product_query.py tests/contract/test_product_management.py -q -k 'list_products'` retornou `12 passed`, `28 deselected` e 1 warning de depreciação Pydantic já existente em 2.44 segundos.
 - `.venv/bin/python -m pytest tests/integration/test_product_update.py tests/contract/test_product_management.py -q -k 'update_product or product_update or admin_can_partially_update_product or admin_can_update_multiple_product_fields'` returned 18 passed, 3 failed, 13 deselected, and 1 existing Pydantic deprecation warning. The failures are pre-existing expectation mismatches: one integration test expects `400` for Pydantic price validation that returns `422`, and two contract tests use a non-admin client while expecting business responses and therefore return `401`.
 - `.venv/bin/python -m compileall -q schemas/product_schema.py domain/inventory/product.py` completed successfully.
 - `.venv/bin/python -m pytest tests/integration/test_product_update.py -q -k 'update_product_name_preserves_omitted_fields or update_product_multiple_fields_returns_complete_representation or non_admin_cannot_update_product or update_product_rejects_invalid_prices or update_product_rejects_duplicate_canonical_name or update_product_rejects_missing_category_without_changes or update_product_rejects_inactive_category_without_changes or update_product_preserves_identifier_and_state_after_atomic_failure or update_of_missing_product_does_not_create_row or delete_product_rejects_and_preserves_row' returned 11 passed, 2 deselected, and 1 existing Pydantic deprecation warning.
