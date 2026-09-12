@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Any
 
 # internal import's
-from domain.enums.status import Status
+from enums.status import Status
 from domain.inventory.category import Category
 
 class Product:

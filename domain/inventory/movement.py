@@ -2,8 +2,8 @@
 from datetime import datetime
 
 # internal imports
-from domain.enums.movement_type import MovementType
-from domain.users.app_user import SystemUser
+from enums.movement_type import MovementType
+from domain.users.app_user import User
 from domain.inventory.movement_item import MovementItem
 
 
@@ -13,7 +13,7 @@ class Movement:
     """
 
     def __init__(self,
-                 user: SystemUser,
+                 user: User,
                  movement_type: MovementType,
                  movement_date: datetime,
                  items: list[MovementItem],
@@ -31,7 +31,7 @@ class Movement:
         return self._id
 
     @property
-    def user(self) -> SystemUser:
+    def user(self) -> User:
         return self._user
 
     @property

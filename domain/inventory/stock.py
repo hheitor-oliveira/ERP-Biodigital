@@ -1,6 +1,6 @@
 # internal's imports
 from domain.inventory.stock_item import StockItem
-from domain.enums.status import Status
+from enums.status import Status
 
 class Stock:
   

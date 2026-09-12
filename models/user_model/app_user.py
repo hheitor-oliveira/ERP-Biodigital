@@ -2,9 +2,9 @@ from models.base import Base
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-class AppUserModel(Base):
+class UserModel(Base):
   
-  __tablename__ = 'app_user'
+  __tablename__ = 'users'
   
   user_id: Mapped[int] = mapped_column(
     primary_key = True,

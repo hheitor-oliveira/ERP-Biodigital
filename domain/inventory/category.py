@@ -1,12 +1,15 @@
 # lib's import
 import typing
+from enums.status import Status
 
 class Category:
   def __init__(self,
                name: str,
+               status: Status = Status.ACTIVE,
                id: int | None = None):
     self._id = id
     self._name = name
+    self._status = status
     
   @property
   def name(self) -> str:
@@ -15,6 +18,10 @@ class Category:
   @property
   def id(self) -> int | None:
     return self._id
+  
+  @property
+  def status(self) -> Status:
+    return self._status
   
   @classmethod
   def restore(cls,
