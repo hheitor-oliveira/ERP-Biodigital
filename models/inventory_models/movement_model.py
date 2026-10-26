@@ -1,5 +1,5 @@
 from models.base import Base
-from domain.enums.movement_type import MovementType
+from enums.movement_type import MovementType
 from sqlalchemy import Enum as SQLEnum
 from datetime import datetime
 from sqlalchemy import ForeignKey,DateTime, func
