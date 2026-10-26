@@ -1,9 +1,10 @@
 from models.base import Base
+from models.inventory_models.category_model import CategoryModel
 from enums.status import Status
 from sqlalchemy import Enum as SQLEnum
 from decimal import Decimal
 from sqlalchemy import ForeignKey, Numeric, String, CheckConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 class ProductModel(Base):
   __tablename__ = 'product'
@@ -17,6 +18,8 @@ class ProductModel(Base):
     ForeignKey('category.category_id'),
     nullable = False
   )
+
+  category: Mapped["CategoryModel"] = relationship()
   
   available_quantity: Mapped[int] = mapped_column(
     server_default = '0'

@@ -36,7 +36,7 @@ class Product:
                 available_quantity: int,
                 sale_value: Decimal,
                 cost_price: Decimal,
-                status: str):
+                status: Status):
         
         product = object.__new__(cls)
         

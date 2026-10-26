@@ -26,11 +26,13 @@ class Category:
   @classmethod
   def restore(cls,
               name: str,
-              id: int | None) -> typing.Self:
+              id: int | None,
+              status: Status) -> typing.Self:
     
     category = object.__new__(cls)
     
     category._name = name
     category._id = id
+    category._status = status
     
     return category
